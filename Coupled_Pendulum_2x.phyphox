@@ -1,0 +1,193 @@
+<phyphox version="1.20">
+    <title>Coupled pendulum (2 sensors)</title>
+    <category>phyphox:mini</category>
+    <color>ADEBB3</color>
+    <description>Records the accelerometers of two phyphox:mini at the same time and plots both in one graph. Made for coupled pendulums: two pendulums joined by a spring or a string exchange their energy back and forth, which shows up as a beat - while one amplitude grows, the other shrinks. Mount one phyphox:mini on each pendulum, in the same orientation. Works with any firmware version: 416 Hz with 15 samples per packet gives about 30 graph updates per second.</description>
+    <translations>
+        <translation locale="de">
+            <title>Gekoppeltes Pendel (2 Sensoren)</title>
+            <category>phyphox:mini</category>
+            <description>Zeichnet die Beschleunigungssensoren zweier phyphox:mini gleichzeitig auf und stellt beide in einem Graphen dar. Gedacht für gekoppelte Pendel: Zwei über Feder oder Faden verbundene Pendel tauschen ihre Energie hin und her, was sich als Schwebung zeigt – während die eine Amplitude wächst, schrumpft die andere. Je einen phyphox:mini an ein Pendel montieren, beide gleich ausgerichtet. Läuft mit jedem Firmwarestand: 416 Hz mit 15 Samples pro Paket ergeben rund 30 Graph-Updates pro Sekunde.</description>
+            <string original="Acceleration">Beschleunigung</string>
+            <string original="Mount one phyphox:mini on each pendulum, both in the same orientation. Pick the axis that points along the direction of swing - the view 'All axes' shows all three at once so you can see which one it is. Orange = pendulum 1, blue = pendulum 2.">Je einen phyphox:mini an ein Pendel montieren, beide gleich ausgerichtet. Wähle die Achse, die in Schwingungsrichtung zeigt – die Ansicht „Alle Achsen“ zeigt alle drei gleichzeitig, damit du siehst, welche es ist. Orange = Pendel 1, Blau = Pendel 2.</string>
+            <string original="Axis">Achse</string>
+            <string original="Both pendulums, X">Beide Pendel, X</string>
+            <string original="Both pendulums, Y">Beide Pendel, Y</string>
+            <string original="Both pendulums, Z">Beide Pendel, Z</string>
+            <string original="In a coupled pendulum the two envelopes run in opposite directions: while one pendulum grows, the other one dies down. The time from one standstill of a pendulum to the next is the beat period.">Beim gekoppelten Pendel laufen die beiden Einhüllenden gegenläufig: Während das eine Pendel größer wird, kommt das andere zur Ruhe. Die Zeit von einem Stillstand eines Pendels bis zum nächsten ist die Schwebungsdauer.</string>
+            <string original="All axes">Alle Achsen</string>
+            <string original="Check">Kontrolle</string>
+            <string original="Both counters have to grow at the same pace, roughly 455 per second each. If one lags behind, that device is dropping packets - the firmware does not report this, so the counter is the only way to notice.">Beide Zähler müssen gleich schnell wachsen, jeweils rund 455 pro Sekunde. Bleibt einer zurück, verliert dieses Gerät Pakete – die Firmware meldet das nicht, der Zähler ist also die einzige Möglichkeit, es zu bemerken.</string>
+            <string original="Samples pendulum 1">Samples Pendel 1</string>
+            <string original="Samples pendulum 2">Samples Pendel 2</string>
+            <string original="Both streams carry their own timestamps and are not sampled simultaneously, so do not subtract the two curves inside the app - sample number 500 of one device is not the same instant as number 500 of the other. For normal modes (sum and difference) export the data and interpolate both series onto a common time axis first.">Beide Datenströme haben eigene Zeitstempel und werden nicht gleichzeitig abgetastet. Subtrahiere die Kurven deshalb nicht in der App – Sample 500 des einen Geräts ist nicht derselbe Zeitpunkt wie Sample 500 des anderen. Für die Normalmoden (Summe und Differenz) die Daten exportieren und beide Reihen vorher auf eine gemeinsame Zeitachse interpolieren.</string>
+            <string original="Pendulum 1">Pendel 1</string>
+            <string original="Pendulum 2">Pendel 2</string>
+        </translation>
+    </translations>
+
+    <data-containers>
+        <container size="0">t1</container>
+        <container size="0">a1x</container>
+        <container size="0">a1y</container>
+        <container size="0">a1z</container>
+        <container size="0">t2</container>
+        <container size="0">a2x</container>
+        <container size="0">a2y</container>
+        <container size="0">a2z</container>
+
+        <!-- axis selection, only used to switch graph visibility -->
+        <container size="1" init="0">axis_sel</container>
+        <container size="1" init="1">ind0</container>
+        <container size="1" init="0">ind1</container>
+        <container size="1" init="0">ind2</container>
+
+        <container size="1">n1</container>
+        <container size="1">n2</container>
+    </data-containers>
+
+    <input>
+        <!-- Both blocks look for the same device name. phyphox asks which
+             physical phyphox:mini belongs to which id when the experiment starts.
+
+             config bytes: enable=accelerometer only, 416 Hz, 16 g, gyro range
+             (unused), float, event_size=15, reserved.
+
+             The graph updates rate/event_size times per second. event_size
+             must stay at 15 on firmware older than the packet length fix:
+             that firmware always sends 240 bytes no matter what event_size
+             says, and 15*16 = 240 is the only value that matches. Measured on
+             a phyphox:mini with the old firmware, event_size=2 delivered 2 valid frames
+             plus 13 frames of stale stack content per packet.
+
+             So smoothness comes from the rate instead: 416/15 gives about 30
+             updates per second, measured 30.3. This combination works on every
+             firmware version. With the fix in place, 104 Hz and event_size=2
+             would give the same smoothness at a quarter of the data.
+
+             16 g is deliberate - in the smaller ranges the firmware scales the
+             float values by 9.81 twice, so they come out too large. Measured
+             at rest in 16 g: |a| = 9.67 to 9.75 m/s². -->
+        <bluetooth id="Pendulum 1" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060101000F00</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="0"  repeating="16" conversion="float32LittleEndian">t1</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="4"  repeating="16" conversion="float32LittleEndian">a1x</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="8"  repeating="16" conversion="float32LittleEndian">a1y</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="12" repeating="16" conversion="float32LittleEndian">a1z</output>
+        </bluetooth>
+        <bluetooth id="Pendulum 2" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060101000F00</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="0"  repeating="16" conversion="float32LittleEndian">t2</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="4"  repeating="16" conversion="float32LittleEndian">a2x</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="8"  repeating="16" conversion="float32LittleEndian">a2y</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="12" repeating="16" conversion="float32LittleEndian">a2z</output>
+        </bluetooth>
+    </input>
+
+    <views>
+        <view label="Acceleration">
+            <info label="Mount one phyphox:mini on each pendulum, both in the same orientation. Pick the axis that points along the direction of swing - the view 'All axes' shows all three at once so you can see which one it is. Orange = pendulum 1, blue = pendulum 2."/>
+            <dropdown label="Axis" default="0">
+                <output>axis_sel</output>
+                <map value="0">X</map>
+                <map value="1">Y</map>
+                <map value="2">Z</map>
+            </dropdown>
+            <!-- Three graphs, exactly one visible. They plot the raw buffers
+                 directly, so they update as fast as packets arrive and do not
+                 wait for the analysis step. -->
+            <graph label="Both pendulums, X" visibility="ind0" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1x</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2x</input>
+            </graph>
+            <graph label="Both pendulums, Y" visibility="ind1" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1y</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2y</input>
+            </graph>
+            <graph label="Both pendulums, Z" visibility="ind2" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1z</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2z</input>
+            </graph>
+            <info label="In a coupled pendulum the two envelopes run in opposite directions: while one pendulum grows, the other one dies down. The time from one standstill of a pendulum to the next is the beat period."/>
+        </view>
+
+        <view label="All axes">
+            <graph label="X" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1x</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2x</input>
+            </graph>
+            <graph label="Y" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1y</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2y</input>
+            </graph>
+            <graph label="Z" timeOnX="true" labelX="t" unitX="s" labelY="a" unitY="m/s²" partialUpdate="true" hideTimeMarkers="true">
+                <input axis="x" color="orange">t1</input>
+                <input axis="y" color="orange">a1z</input>
+                <input axis="x" color="blue">t2</input>
+                <input axis="y" color="blue">a2z</input>
+            </graph>
+        </view>
+
+        <view label="Check">
+            <info label="Both counters have to grow at the same pace, roughly 455 per second each. If one lags behind, that device is dropping packets - the firmware does not report this, so the counter is the only way to notice."/>
+            <value label="Samples pendulum 1" color="orange" size="1" precision="0" scientific="false" factor="1">
+                <input>n1</input>
+            </value>
+            <value label="Samples pendulum 2" color="blue" size="1" precision="0" scientific="false" factor="1">
+                <input>n2</input>
+            </value>
+            <separator height="0.5"/>
+            <info label="Both streams carry their own timestamps and are not sampled simultaneously, so do not subtract the two curves inside the app - sample number 500 of one device is not the same instant as number 500 of the other. For normal modes (sum and difference) export the data and interpolate both series onto a common time axis first."/>
+        </view>
+    </views>
+
+    <analysis>
+        <!-- Only turns the dropdown into three 0/1 flags for graph visibility.
+             No per-sample work, so this cannot slow the graphs down. -->
+        <formula formula="1-min(abs([1]-0),1)">
+            <input keep="true">axis_sel</input>
+            <output keep="true">ind0</output>
+        </formula>
+        <formula formula="1-min(abs([1]-1),1)">
+            <input keep="true">axis_sel</input>
+            <output keep="true">ind1</output>
+        </formula>
+        <formula formula="1-min(abs([1]-2),1)">
+            <input keep="true">axis_sel</input>
+            <output keep="true">ind2</output>
+        </formula>
+        <count>
+            <input keep="true">t1</input>
+            <output>n1</output>
+        </count>
+        <count>
+            <input keep="true">t2</input>
+            <output>n2</output>
+        </count>
+    </analysis>
+
+    <export>
+        <set name="Pendulum 1">
+            <data name="t (s)">t1</data>
+            <data name="ax (m/s²)">a1x</data>
+            <data name="ay (m/s²)">a1y</data>
+            <data name="az (m/s²)">a1z</data>
+        </set>
+        <set name="Pendulum 2">
+            <data name="t (s)">t2</data>
+            <data name="ax (m/s²)">a2x</data>
+            <data name="ay (m/s²)">a2y</data>
+            <data name="az (m/s²)">a2z</data>
+        </set>
+    </export>
+</phyphox>
