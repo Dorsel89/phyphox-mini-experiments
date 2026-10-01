@@ -1,4 +1,4 @@
-<phyphox version="1.20">
+<phyphox version="1.20" locale="en">
     <title>Pressure (Reference + Mobile Sensor)</title>
     <category>phyphox:mini</category>
     <color>ADEBB3</color>

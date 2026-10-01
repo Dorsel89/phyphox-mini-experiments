@@ -1,66 +1,178 @@
-<phyphox version="1.18">
+<phyphox version="1.20" locale="en">
     <title>CO₂ Calibration</title>
     <category>phyphox:mini</category>
     <color>ADEBB3</color>
-    <description>STCC4</description>
+    <description>Forced recalibration of the STCC4 CO₂ sensor of a phyphox:mini. Take the phyphox:mini into fresh air, press start and watch the reading settle. Then press "Start calibration": the sensor measures for 30 s and sets itself to the reference value. The status shows whether the calibration is still running or finished. Afterwards "Resume measurement" shows the calibrated reading.
+
+A reading stuck at exactly 380 ppm is the lower limit of the sensor output. The sensor then reads too low and needs this calibration.
+
+The calibration permanently changes the sensor's calibration.</description>
     <translations>
         <translation locale="de">
             <title>CO₂-Kalibrierung</title>
             <category>phyphox:mini</category>
-            <string original="Rawdata">Rohdaten</string>
-            <string original="CO₂">CO₂</string>
-            <string original="Place the sensor in the fresh air and press start. Calibration is completed once you're reading 0 ppm in the graph.">Stellen Sie den Sensor an die frische Luft und drücken Sie auf „Start“. Die Kalibrierung ist abgeschlossen, sobald im Diagramm ein Wert von 0 ppm angezeigt wird.</string>
-            
+            <description>Kalibrierung (Forced Recalibration) des CO₂-Sensors STCC4 eines phyphox:mini. Bringe den phyphox:mini an die frische Luft, drücke Start und warte, bis sich der Messwert beruhigt hat. Dann „Kalibrierung starten“ drücken: Der Sensor misst 30 s lang und stellt sich auf den Referenzwert ein. Die Statusanzeige zeigt, ob die Kalibrierung noch läuft oder fertig ist. Danach zeigt „Messung fortsetzen“ den kalibrierten Messwert.
+
+Ein Messwert, der genau bei 380 ppm stehen bleibt, ist die Untergrenze der Sensorausgabe. Der Sensor misst dann zu niedrig und braucht diese Kalibrierung.
+
+Die Kalibrierung verändert die Kalibrierung des Sensors dauerhaft.</description>
+            <string original="Calibration">Kalibrierung</string>
+            <string original="1. Put the phyphox:mini in fresh air (outdoors or at a wide open window) and press start. 2. Wait until the CO₂ reading has settled - one to two minutes. 3. Press &quot;Start calibration&quot; and leave the phyphox:mini in the fresh air until the status says finished.">1. Den phyphox:mini an die frische Luft bringen (draußen oder am weit geöffneten Fenster) und Start drücken. 2. Warten, bis sich der CO₂-Wert beruhigt hat – ein bis zwei Minuten. 3. „Kalibrierung starten“ drücken und den phyphox:mini an der frischen Luft lassen, bis der Status „fertig“ anzeigt.</string>
+            <string original="CO₂ (latest reading)">CO₂ (letzter Messwert)</string>
+            <string original="Status">Status</string>
+            <string original="measuring - ready to calibrate">Messung läuft – bereit zur Kalibrierung</string>
+            <string original="calibration running - keep in fresh air">Kalibrierung läuft – an der frischen Luft lassen</string>
+            <string original="calibration finished">Kalibrierung abgeschlossen</string>
+            <string original="Time remaining">Restzeit</string>
+            <string original="Reference value (fresh air)">Referenzwert (Frischluft)</string>
+            <string original="Start calibration">Kalibrierung starten</string>
+            <string original="Resume measurement">Messung fortsetzen</string>
+            <string original="While the calibration runs and after it has finished, the phyphox:mini sends no new readings. Press &quot;Resume measurement&quot; afterwards: in fresh air the reading should now be close to the reference value.">Während der Kalibrierung und danach sendet der phyphox:mini keine neuen Messwerte. Anschließend „Messung fortsetzen“ drücken: An der frischen Luft sollte der Wert jetzt nahe am Referenzwert liegen.</string>
+            <string original="Time (s)">Zeit (s)</string>
         </translation>
     </translations>
 
-    <data-containers>	
-		<container size="0">co2_time_raw</container>
-		<container size="0">co2_time</container>
-		<container size="1">co2_timeOffset</container>
-		<container size="0">co2</container>
+    <!--
+        The STCC4 config characteristic cddf100c takes two bytes:
+          byte 0 = 0x01 measure, 0x02 forced recalibration
+          byte 1 = measure: interval in 100 ms steps
+                   calibration: reference concentration in 10 ppm steps
+        On connect the experiment only starts measuring (010A, one reading per
+        second). The calibration is sent by the button, not on connect: the old
+        version calibrated right away on connecting, often before the sensor
+        had settled in fresh air.
 
+        What the firmware does on 0x02: stop the measurement (1.2 s), measure
+        continuously for 30 s, stop again (1.2 s), apply the recalibration.
+        It does not report back when it is done, so the status here is a
+        countdown from the moment the button was pressed. CAL_S = 35 s leaves
+        a few seconds of margin on top of the ~32.5 s the firmware needs.
+        After the recalibration the sensor stays idle and the firmware sends
+        nothing (older firmware sent 0 ppm instead) until "Resume measurement"
+        writes 010A again.
+    -->
+    <data-containers>
+        <container size="0">co2_time_raw</container>
+        <container size="0">co2_time</container>
+        <container size="1">co2_timeOffset</container>
+        <container size="0">co2</container>
+
+        <!-- what the buttons send, both bytes go out together on trigger "send" -->
+        <container size="1" init="1">cmd</container>
+        <container size="1" init="10">arg</container>
+
+        <container size="1" init="420">ref_ppm</container>
+        <container size="1" init="42">ref_byte</container>
+
+        <container size="1" init="0">t_now</container>
+        <container size="1" init="0">cal_t0</container>
+        <container size="1" init="0">cal_started</container>
+        <container size="1" init="0">phase</container>
+        <container size="1" init="0">remaining</container>
     </data-containers>
-    <input>
-        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="notification" subscribeOnStart="true">
-			<config char="cddf100c-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0228</config>
-            <output char="cddf100b-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="float32LittleEndian">co2</output>
-			<output char="cddf100b-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">co2_time_raw</output>
-        </bluetooth>
-    </input>       
-    <output>
-    </output>
-    <views>
-        <view label="Rawdata">
-            <info label="Place the sensor in the fresh air and press start. Calibration is completed once you're reading 0 ppm in the graph.">
-            </info>
-            <graph label="CO₂" timeOnX="true" labelX="time" unitX="s" labelY="CO₂" unitY="ppm" partialUpdate="true">
-                <input axis="x">co2_time</input>
-                <input axis="y">co2</input>                
-            </graph>
-            <value label="CO₂" unit="ppm" size="1" precision="1" scientific="false" factor="1" >
-                <input>co2</input>
-            </value> 
-        </view>
-       
-    </views>
-    <analysis sleep="0" onUserInput="false">
 
-		<first>
+    <input>
+        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <config char="cddf100c-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010A</config>
+            <output char="cddf100b-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="float32LittleEndian">co2</output>
+            <output char="cddf100b-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian">co2_time_raw</output>
+        </bluetooth>
+    </input>
+
+    <output>
+        <bluetooth id="phyphox:mini">
+            <input keep="true" char="cddf100c-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="send">cmd</input>
+            <input keep="true" char="cddf100c-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="send">arg</input>
+        </bluetooth>
+    </output>
+
+    <views>
+        <view label="Calibration">
+            <info label="1. Put the phyphox:mini in fresh air (outdoors or at a wide open window) and press start. 2. Wait until the CO₂ reading has settled - one to two minutes. 3. Press &quot;Start calibration&quot; and leave the phyphox:mini in the fresh air until the status says finished."/>
+            <separator height="1"/>
+            <value label="CO₂ (latest reading)" unit="ppm" size="2" precision="0">
+                <input>co2</input>
+            </value>
+            <separator height="1"/>
+            <value label="Status" size="1.2">
+                <input>phase</input>
+                <map max="0.5">measuring - ready to calibrate</map>
+                <map min="0.5" max="1.5">calibration running - keep in fresh air</map>
+                <map min="1.5">calibration finished</map>
+            </value>
+            <value label="Time remaining" unit="s" size="1.2" precision="0">
+                <input>remaining</input>
+                <map max="0">-</map>
+            </value>
+            <separator height="1"/>
+            <edit label="Reference value (fresh air)" unit="ppm" default="420" min="380" max="2550" signed="false" decimal="false">
+                <output>ref_ppm</output>
+            </edit>
+            <button label="Start calibration">
+                <input type="value">2</input>
+                <output>cmd</output>
+                <input>ref_byte</input>
+                <output>arg</output>
+                <input>t_now</input>
+                <output>cal_t0</output>
+                <input type="value">1</input>
+                <output>cal_started</output>
+                <trigger>send</trigger>
+            </button>
+            <button label="Resume measurement">
+                <input type="value">1</input>
+                <output>cmd</output>
+                <input type="value">10</input>
+                <output>arg</output>
+                <input type="value">0</input>
+                <output>cal_started</output>
+                <trigger>send</trigger>
+            </button>
+            <info label="While the calibration runs and after it has finished, the phyphox:mini sends no new readings. Press &quot;Resume measurement&quot; afterwards: in fresh air the reading should now be close to the reference value."/>
+        </view>
+    </views>
+
+    <analysis sleep="0.2">
+        <!-- wall clock, keeps running through a pause like the sensor does -->
+        <timer linearTime="true">
+            <output as="out">t_now</output>
+        </timer>
+
+        <!-- the firmware takes the reference in 10 ppm steps -->
+        <formula formula="round([1]/10)">
+            <input as="in" clear="false">ref_ppm</input>
+            <output as="out">ref_byte</output>
+        </formula>
+
+        <!-- 0 = measuring, 1 = calibration running, 2 = finished; CAL_S = 35 s -->
+        <formula formula="[3]*(1+heaviside([1]-[2]-35))">
+            <input as="in" clear="false">t_now</input>
+            <input as="in" clear="false">cal_t0</input>
+            <input as="in" clear="false">cal_started</input>
+            <output as="out">phase</output>
+        </formula>
+        <formula formula="[3]*max(0,35-([1]-[2]))">
+            <input as="in" clear="false">t_now</input>
+            <input as="in" clear="false">cal_t0</input>
+            <input as="in" clear="false">cal_started</input>
+            <output as="out">remaining</output>
+        </formula>
+
+        <first>
             <input as="value" clear="false">co2_time_raw</input>
             <output as="first">co2_timeOffset</output>
-        </first>		
-		<subtract>
+        </first>
+        <subtract>
             <input as="minuend" clear="false">co2_time_raw</input>
             <input as="subtrahend" clear="false">co2_timeOffset</input>
-            <output as="difference">co2_time</output>			
+            <output as="difference">co2_time</output>
         </subtract>
-
     </analysis>
+
     <export>
-        <set name="Raw data">
-			<data name="Time CO₂ (s)">co2_time</data>
-			<data name="CO₂ (ppm)">co2</data>
+        <set name="CO₂">
+            <data name="Time (s)">co2_time</data>
+            <data name="CO₂ (ppm)">co2</data>
         </set>
     </export>
 </phyphox>

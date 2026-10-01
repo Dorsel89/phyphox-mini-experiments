@@ -1,4 +1,4 @@
-<phyphox version="1.20">
+<phyphox version="1.20" locale="en">
     <title>Coupled pendulum (2 sensors)</title>
     <category>phyphox:mini</category>
     <color>ADEBB3</color>
@@ -65,9 +65,9 @@
              firmware version. With the fix in place, 104 Hz and event_size=2
              would give the same smoothness at a quarter of the data.
 
-             16 g is deliberate - in the smaller ranges the firmware scales the
-             float values by 9.81 twice, so they come out too large. Measured
-             at rest in 16 g: |a| = 9.67 to 9.75 m/s². -->
+             16 g is deliberate - firmware before the scaling fix multiplies the
+             float values of the smaller ranges by 9.81 twice, 16 g is correct on
+             every version. Measured at rest in 16 g: |a| = 9.67 to 9.75 m/s². -->
         <bluetooth id="Pendulum 1" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
             <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060101000F00</config>
             <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" offset="0"  repeating="16" conversion="float32LittleEndian">t1</output>

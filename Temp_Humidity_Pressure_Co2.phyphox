@@ -1,4 +1,4 @@
-<phyphox version="1.18">
+<phyphox version="1.18" locale="en">
     <title>CO₂, Temperature, Humidity, Pressure</title>
     <category>phyphox:mini</category>
     <color>ADEBB3</color>

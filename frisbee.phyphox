@@ -1,4 +1,4 @@
-<phyphox version="1.18">
+<phyphox version="1.18" locale="en">
     <title>Frisbee</title>
     <category>phyphox:mini</category>
 	<color>ADEBB3</color>
