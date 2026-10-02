@@ -1,12 +1,12 @@
 <phyphox version="1.18" locale="en">
     <title>Frisbee</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini experiments</category>
 	<color>ADEBB3</color>
     <description>frisbee physics</description>
 	<translations>
     <translation locale="de">
       <title>Frisbee</title>
-      <category>phyphox:mini</category>
+      <category>phyphox:mini Experimente</category>
       <description>Physik der Frisbeescheibe</description>
       <string original="Rawdata">Rohdaten</string>
       <string original="Share">Teilen</string>

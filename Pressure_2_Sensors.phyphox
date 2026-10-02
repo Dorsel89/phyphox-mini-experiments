@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Pressure (Reference + Mobile Sensor)</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini tools</category>
     <color>ADEBB3</color>
     <description>Reads the BMP581 air pressure of two phyphox:mini devices at once. Sensor 1 stays at a fixed location and measures how the ambient pressure drifts (weather); sensor 2 is carried around and is corrected by exactly that drift. A button takes the average of the last second of both sensors as the reference point.</description>
     <translations>
         <translation locale="de">
             <title>Luftdruck (Referenz + mobiler Sensor)</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Werkzeuge</category>
             <description>Liest den BMP581-Luftdruck von zwei phyphox:mini gleichzeitig aus. Sensor 1 bleibt an einem festen Ort und misst, wie sich der Umgebungsdruck ändert (Wetter); Sensor 2 wird bewegt und um genau diese Änderung korrigiert. Ein Button übernimmt den Mittelwert der letzten 1 s beider Sensoren als Referenzpunkt.</description>
             <string original="Sensor 1">Sensor 1</string>
             <string original="Sensor 2">Sensor 2</string>

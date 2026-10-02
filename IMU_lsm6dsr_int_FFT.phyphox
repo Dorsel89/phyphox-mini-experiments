@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Acceleration + FFT</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini tools</category>
 	<color>ADEBB3</color>
     <description>LSM6DSR at 6667 Hz in int16 format, like IMU_lsm6dsr_int, plus a frequency spectrum. The FFT runs over the most recent block of samples of one selectable axis and reports the dominant frequency. The frequency axis is scaled with the sample rate measured from the timestamps, not with the nominal 6667 Hz - the sensor clock runs about 8 percent fast, which would shift every frequency by the same amount.</description>
 	<translations>
     <translation locale="de">
       <title>Beschleunigung + FFT</title>
-      <category>phyphox:mini</category>
+      <category>phyphox:mini Werkzeuge</category>
       <description>LSM6DSR mit 6667 Hz im int16-Format, wie IMU_lsm6dsr_int, zusätzlich mit Frequenzspektrum. Die FFT läuft über den jeweils letzten Block an Messwerten einer wählbaren Achse und nennt die dominante Frequenz. Die Frequenzachse wird mit der aus den Zeitstempeln gemessenen Abtastrate skaliert, nicht mit den nominellen 6667 Hz – der Sensortakt läuft rund 8 Prozent zu schnell, was sonst jede Frequenz um denselben Betrag verschieben würde.</description>
       <string original="Accelerometer">Beschleunigungssensor</string>
       <string original="Accelerometer X">Beschleunigungssensor X</string>

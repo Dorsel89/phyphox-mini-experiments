@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Temperature, Humidity</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini raw sensor</category>
     <color>ADEBB3</color>
     <description>Measure temperature and humidity measured by the HDC1080.</description>
     <translations>
         <translation locale="de">
             <title>Temperatur, Feuchtigkeit</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Sensoren</category>
             <description>Messe Temperatur und relative Luftfeuchtigkeit mit dem HDC1080.</description>
             <string original="Rawdata">Rohdaten</string>
             <string original="Settings">Einstellungen</string>

@@ -1,12 +1,12 @@
 <phyphox version="1.18" locale="en">
     <title>CO₂, Temperature, Humidity, Pressure</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini raw sensor</category>
     <color>ADEBB3</color>
     <description>STCC4, HDC1080, BMP581</description>
     <translations>
         <translation locale="de">
             <title>CO₂, Temperatur, Feuchtigkeit, Luftdruck</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Sensoren</category>
             <string original="Rawdata">Rohdaten</string>
             <string original="CO₂">CO₂</string>
             <string original="Temperature">Temperatur</string>

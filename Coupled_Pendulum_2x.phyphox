@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Coupled pendulum (2 sensors)</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini experiments</category>
     <color>ADEBB3</color>
     <description>Records the accelerometers of two phyphox:mini at the same time and plots both in one graph. Made for coupled pendulums: two pendulums joined by a spring or a string exchange their energy back and forth, which shows up as a beat - while one amplitude grows, the other shrinks. Mount one phyphox:mini on each pendulum, in the same orientation. Works with any firmware version: 416 Hz with 15 samples per packet gives about 30 graph updates per second.</description>
     <translations>
         <translation locale="de">
             <title>Gekoppeltes Pendel (2 Sensoren)</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Experimente</category>
             <description>Zeichnet die Beschleunigungssensoren zweier phyphox:mini gleichzeitig auf und stellt beide in einem Graphen dar. Gedacht für gekoppelte Pendel: Zwei über Feder oder Faden verbundene Pendel tauschen ihre Energie hin und her, was sich als Schwebung zeigt – während die eine Amplitude wächst, schrumpft die andere. Je einen phyphox:mini an ein Pendel montieren, beide gleich ausgerichtet. Läuft mit jedem Firmwarestand: 416 Hz mit 15 Samples pro Paket ergeben rund 30 Graph-Updates pro Sekunde.</description>
             <string original="Acceleration">Beschleunigung</string>
             <string original="Mount one phyphox:mini on each pendulum, both in the same orientation. Pick the axis that points along the direction of swing - the view 'All axes' shows all three at once so you can see which one it is. Orange = pendulum 1, blue = pendulum 2.">Je einen phyphox:mini an ein Pendel montieren, beide gleich ausgerichtet. Wähle die Achse, die in Schwingungsrichtung zeigt – die Ansicht „Alle Achsen“ zeigt alle drei gleichzeitig, damit du siehst, welche es ist. Orange = Pendel 1, Blau = Pendel 2.</string>

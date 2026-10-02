@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Earth rotation (LSM6DSR)</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini experiments</category>
     <color>ADEBB3</color>
     <description>Measures the rotation rate of the Earth with the LSM6DSR gyroscope of a phyphox:mini. The gyroscope runs at its most sensitive range (125 °/s). Because the Earth signal is about the size of a single sensor bit, the bias is removed by an ABBA reversal: measure flat, turn the phyphox:mini upside down, measure, turn it back and measure again. The Earth signal changes sign with the flip, the sensor bias does not.</description>
     <translations>
         <translation locale="de">
             <title>Erdrotation (LSM6DSR)</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Experimente</category>
             <description>Misst die Drehrate der Erde mit dem LSM6DSR-Gyroskop eines phyphox:mini. Das Gyroskop läuft im empfindlichsten Messbereich (125 °/s). Da das Erdsignal etwa so groß ist wie ein einzelnes Sensorbit, wird der Nullpunktfehler über eine ABBA-Umkehr entfernt: flach messen, phyphox:mini umdrehen, messen, zurückdrehen und nochmal messen. Das Erdsignal wechselt beim Umdrehen das Vorzeichen, der Sensor-Offset nicht.</description>
             <string original="Measurement">Messung</string>
             <string original="Put the phyphox:mini on a table that does not vibrate, start the measurement and do not touch it during a measuring phase. Phase 1 = settle, 2 = flat (A1), 3 = TURN OVER, 4 = upside down (B), 5 = TURN BACK, 6 = flat (A2), 7 = done. Only turn the phyphox:mini while the phase number is 3 or 5.">Den phyphox:mini auf einen erschütterungsfreien Tisch legen, die Messung starten und ihn während einer Messphase nicht berühren. Phase 1 = beruhigen, 2 = flach (A1), 3 = UMDREHEN, 4 = kopfüber (B), 5 = ZURÜCKDREHEN, 6 = flach (A2), 7 = fertig. Nur dann umdrehen, wenn die Phasennummer 3 oder 5 ist.</string>

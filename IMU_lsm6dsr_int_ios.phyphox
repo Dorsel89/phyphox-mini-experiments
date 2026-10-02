@@ -1,12 +1,12 @@
 <phyphox version="1.12" locale="en">
     <title>Acceleration iOS</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini raw sensor</category>
 	<color>ADEBB3</color>
     <description>LSM6DSR 6667Hz</description>
 	<translations>
     <translation locale="de">
       <title>Beschleunigung iOS</title>
-      <category>phyphox:mini</category>
+      <category>phyphox:mini Sensoren</category>
       <string original="Accelerometer">Beschleunigungssensor</string>
       <string original="Accelerometer X">Beschleunigungssensor X</string>
       <string original="Accelerometer Y">Beschleunigungssensor Y</string>

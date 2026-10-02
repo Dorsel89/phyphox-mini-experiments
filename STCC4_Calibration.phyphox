@@ -1,6 +1,6 @@
 <phyphox version="1.20" locale="en">
     <title>CO₂ Calibration</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini settings</category>
     <color>ADEBB3</color>
     <description>Forced recalibration of the STCC4 CO₂ sensor of a phyphox:mini. Take the phyphox:mini into fresh air, press start and watch the reading settle. Then press "Start calibration": the sensor measures for 30 s and sets itself to the reference value. The status shows whether the calibration is still running or finished. Afterwards "Resume measurement" shows the calibrated reading.
 
@@ -10,7 +10,7 @@ The calibration permanently changes the sensor's calibration.</description>
     <translations>
         <translation locale="de">
             <title>CO₂-Kalibrierung</title>
-            <category>phyphox:mini</category>
+            <category>phyphox:mini Einstellungen</category>
             <description>Kalibrierung (Forced Recalibration) des CO₂-Sensors STCC4 eines phyphox:mini. Bringe den phyphox:mini an die frische Luft, drücke Start und warte, bis sich der Messwert beruhigt hat. Dann „Kalibrierung starten“ drücken: Der Sensor misst 30 s lang und stellt sich auf den Referenzwert ein. Die Statusanzeige zeigt, ob die Kalibrierung noch läuft oder fertig ist. Danach zeigt „Messung fortsetzen“ den kalibrierten Messwert.
 
 Ein Messwert, der genau bei 380 ppm stehen bleibt, ist die Untergrenze der Sensorausgabe. Der Sensor misst dann zu niedrig und braucht diese Kalibrierung.

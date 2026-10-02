@@ -1,12 +1,12 @@
 <phyphox version="1.20" locale="en">
     <title>Pressure, Temperature</title>
-    <category>phyphox:mini</category>
+    <category>phyphox:mini raw sensor</category>
 	<color>ADEBB3</color>
     <description>Using the Bosch BMP581 sensor to measure air pressure and temperature.</description>
 	<translations>
     <translation locale="de">
       <title>Luftdruck, Temperatur</title>
-      <category>phyphox:mini</category>
+      <category>phyphox:mini Sensoren</category>
       <description>Verwendung des Bosch BMP581 Sensors zur Messung von Luftdruck und Temperatur.</description>
       <string original="Rawdata">Rohdaten</string>
       <string original="Pressure">Luftdruck</string>

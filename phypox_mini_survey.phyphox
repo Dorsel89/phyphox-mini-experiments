@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>phyphox:mini – Rückmeldung</title>
+    <category>phyphox:mini Rückmeldung</category>
+    <color>ADEBB3</color>
+    <description>Feedback zum phyphox:mini.</description>
+    <translations>
+        <translation locale="en">
+            <title>phyphox:mini – Feedback</title>
+            <category>phyphox:mini feedback</category>
+        </translation>
+    </translations>
+    <data-containers>
+        <container size="1">q_moeglichkeiten</container>
+        <container size="1">q_probleme</container>
+        <container size="1">q_experimente</container>
+        <container size="1">q_verbindung</container>
+        <container size="1">q_messwerte</container>
+        <container size="1">q_selbststaendig</container>
+        <container size="1">q_empfehlung</container>
+        <container size="1">q_rolle</container>
+        <container size="1">q_nutzung</container>
+        <container size="1">rx_stored</container>
+        <container size="1">rx_total</container>
+    </data-containers>
+    <views>
+        <view label="Fragebogen">
+            <info label="phyphox:mini – Rückmeldung" bold="true" size="1.2" />
+            <info label="Zuerst oben rechts auf ▶ tippen, dann alle Fragen beantworten und unten absenden." />
+
+            <separator height="2" />
+            <info label="1. Ich bin …" bold="true" />
+            <dropdown default="0">
+                <output>q_rolle</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Lehrer:in</map>
+                <map value="2">Schüler:in</map>
+                <map value="3">Student:in</map>
+                <map value="4">Dozent:in</map>
+                <map value="5">Sonstiges</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Wie oft habe ich den phyphox:mini bisher benutzt?" bold="true" />
+            <dropdown default="0">
+                <output>q_nutzung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">einmal</map>
+                <map value="2">mehrmals</map>
+                <map value="3">regelmäßig</map>
+            </dropdown>
+            
+			<separator height="2" />
+            <info label="3. Der phyphox:mini erweitert meine Experimentiermöglichkeiten." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_moeglichkeiten</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_moeglichkeiten">
+                <input>q_moeglichkeiten</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2"/>
+            <info label="4. Ich hatte technische Probleme mit dem phyphox:mini." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_probleme</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_probleme">
+                <input>q_probleme</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="5. Das Verbinden des phyphox:mini mit dem Smartphone hat problemlos geklappt." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_verbindung</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_verbindung">
+                <input>q_verbindung</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="6. Die Messwerte des phyphox:mini halte ich für verlässlich." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_messwerte</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_messwerte">
+                <input>q_messwerte</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="7. Ich konnte selbstständig mit dem phyphox:mini arbeiten." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_selbststaendig</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_selbststaendig">
+                <input>q_selbststaendig</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="8. Ich würde den phyphox:mini weiterempfehlen." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>q_empfehlung</output>
+            </slider>
+            <value label="Ihre Antwort" visibility="q_empfehlung">
+                <input>q_empfehlung</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2.0" />
+            <button label="Antworten absenden">
+                <trigger>umfrage</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_total">
+                <input>rx_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_total">
+                <input>rx_total</input>
+            </value>
+        </view>
+    </views>
+    <export>
+        <set name="Antworten">
+            <data name="Erweitert die Experimentiermöglichkeiten">q_moeglichkeiten</data>
+            <data name="Technische Probleme aufgetreten">q_probleme</data>
+            <data name="Zufrieden mit den Experimenten">q_experimente</data>
+            <data name="Verbinden hat problemlos geklappt">q_verbindung</data>
+            <data name="Messwerte wirken verlässlich">q_messwerte</data>
+            <data name="Selbstständiges Arbeiten möglich">q_selbststaendig</data>
+            <data name="Würde ihn weiterempfehlen">q_empfehlung</data>
+            <data name="Rolle">q_rolle</data>
+            <data name="Nutzungshäufigkeit">q_nutzung</data>
+        </set>
+    </export>
+    <network>
+    <connection id="umfrage" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=phypox_mini_survey" autoConnect="true" service="http/post" conversion="json">
+        <send id="q_moeglichkeiten" type="buffer" keep="true">q_moeglichkeiten</send>
+        <send id="q_probleme" type="buffer" keep="true">q_probleme</send>
+        <send id="q_experimente" type="buffer" keep="true">q_experimente</send>
+        <send id="q_verbindung" type="buffer" keep="true">q_verbindung</send>
+        <send id="q_messwerte" type="buffer" keep="true">q_messwerte</send>
+        <send id="q_selbststaendig" type="buffer" keep="true">q_selbststaendig</send>
+        <send id="q_empfehlung" type="buffer" keep="true">q_empfehlung</send>
+        <send id="q_rolle" type="buffer" keep="true">q_rolle</send>
+        <send id="q_nutzung" type="buffer" keep="true">q_nutzung</send>
+        <send id="client" type="meta">uniqueID</send>
+        <send id="time" type="time" />
+        <receive id="stored" append="false">rx_stored</receive>
+        <receive id="total" append="false">rx_total</receive>
+    </connection>
+    </network>
+</phyphox>
