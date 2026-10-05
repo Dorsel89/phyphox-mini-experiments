@@ -10,10 +10,26 @@
             <category>phyphox:mini Werkzeuge</category>
             <description>Liest die im Hintergrund von phyphox:mini aufgezeichneten CO₂-/Temperatur-/Feuchtigkeits-/Luftdruckdaten aus.</description>
             <string original="Logged data">Aufgezeichnete Daten</string>
-            <string original="Press a button below to fetch the data phyphox:mini logged in the background. This can take a few seconds for large datasets.">Tippe auf einen Button, um die im Hintergrund von phyphox:mini aufgezeichneten Daten abzurufen. Dies kann bei großen Datensätzen einige Sekunden dauern.</string>
-            <string original="Request all data">Alle Daten anfordern</string>
-            <string original="Request last 24h">Letzte 24 h anfordern</string>
-            <string original="Request last hour">Letzte Stunde anfordern</string>
+            <string original="First start the measurement with ▶, choose the time range and press Request data to fetch the data phyphox:mini logged in the background. The phyphox:mini only sends while the measurement runs.">Starte zuerst die Messung mit ▶, wähle den Zeitraum und tippe auf Daten abrufen, um die im Hintergrund von phyphox:mini aufgezeichneten Daten zu holen. Der phyphox:mini sendet nur, solange die Messung läuft.</string>
+            <string original="Time range">Zeitraum</string>
+            <string original="last 60 min">letzte 60 min</string>
+            <string original="last 24 h">letzte 24 h</string>
+            <string original="last week">letzte Woche</string>
+            <string original="all data">alle Daten</string>
+            <string original="Request data">Daten abrufen</string>
+            <string original="Status">Status</string>
+            <string original="Current settings on the phyphox:mini. They are read when the measurement starts (▶).">Aktuelle Einstellungen auf dem phyphox:mini. Sie werden beim Start der Messung (▶) gelesen.</string>
+            <string original="Logging">Aufzeichnung</string>
+            <string original="running">läuft</string>
+            <string original="stopped">gestoppt</string>
+            <string original="Logged: CO₂">Aufgezeichnet: CO₂</string>
+            <string original="Logged: temperature">Aufgezeichnet: Temperatur</string>
+            <string original="Logged: humidity">Aufgezeichnet: Feuchtigkeit</string>
+            <string original="Logged: pressure">Aufgezeichnet: Luftdruck</string>
+            <string original="yes">ja</string>
+            <string original="no">nein</string>
+            <string original="Interval">Intervall</string>
+            <string original="Records received">Empfangene Datensätze</string>
             <string original="CO₂">CO₂</string>
             <string original="Temperature">Temperatur</string>
             <string original="Relative humidity">Relative Luftfeuchtigkeit</string>
@@ -23,10 +39,25 @@
 
     <data-containers>
 
-        <container size="1" static="false" init="60" clearGroup="_">max_age_minutes</container>
-        <container size="1" static="false" init="60" clearGroup="_">max_age_lo</container>
+        <container size="1">n_records</container>
+        <!-- The time range comes from the dropdown (minutes, 0 = everything) and
+             is split into low/high byte by the formulas below. The button only
+             triggers the send; it must not set any value that is sent, because
+             phyphox sends before a button's own values reach the containers
+             ("24 h" arrived as "1 h" on a phyphox:mini). init = dropdown default. -->
+        <container size="1" static="false" init="0" clearGroup="_">max_age_minutes</container>
+        <container size="1" static="false" init="0" clearGroup="_">max_age_lo</container>
         <container size="1" static="false" init="0" clearGroup="_">max_age_hi</container>
-        <container size="1" static="false" init="2" clearGroup="_">cmd_dump</container>
+        <container size="1" static="true" init="2">cmd_dump</container>
+
+        <!-- Read back from the phyphox:mini (see <input>), empty until the first read. -->
+        <container size="1">dev_running</container>
+        <container size="1">dev_mask</container>
+        <container size="1">dev_interval</container>
+        <container size="1">dev_co2</container>
+        <container size="1">dev_temperature</container>
+        <container size="1">dev_humidity</container>
+        <container size="1">dev_pressure</container>
 
         <container size="0">time</container>
 
@@ -37,27 +68,41 @@
     </data-containers>
 
     <input>
-        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="notification" mtu="180" subscribeOnStart="true">
+        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="notification" mtu="180" subscribeOnStart="false">
             <output char="cddf1010-30f7-4671-8b43-5e40ba53514a" offset="0" conversion="int32LittleEndian" repeating="20">time</output>
             <output char="cddf1010-30f7-4671-8b43-5e40ba53514a" offset="4" conversion="float32LittleEndian" repeating="20">co2</output>
             <output char="cddf1010-30f7-4671-8b43-5e40ba53514a" offset="8" conversion="float32LittleEndian" repeating="20">temperature</output>
             <output char="cddf1010-30f7-4671-8b43-5e40ba53514a" offset="12" conversion="float32LittleEndian" repeating="20">humidity</output>
             <output char="cddf1010-30f7-4671-8b43-5e40ba53514a" offset="16" conversion="float32LittleEndian" repeating="20">pressure</output>
         </bluetooth>
+        <!-- Reading the config characteristic returns the settings in effect:
+             byte 0 running, byte 1 sensor mask, bytes 2-3 interval in s. -->
+        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="poll" rate="0.0033333">
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="0" length="1" conversion="singleByte">dev_running</output>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="1" length="1" conversion="singleByte">dev_mask</output>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="2" length="2" conversion="uint16LittleEndian">dev_interval</output>
+        </bluetooth>
     </input>
     <output>
         <bluetooth id="phyphox:mini" name="phyphox:mini">
-            <input keep="false" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="setConfig">cmd_dump</input>
-            <input keep="false" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="setConfig">max_age_lo</input>
-            <input keep="false" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="setConfig">max_age_hi</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="dump">cmd_dump</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="dump">max_age_lo</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="dump">max_age_hi</input>
         </bluetooth>
     </output>
 
     <views>
         <view label="Logged data">
-            <info label="Press a button below to fetch the data phyphox:mini logged in the background. This can take a few seconds for large datasets.">
+            <info label="First start the measurement with ▶, choose the time range and press Request data to fetch the data phyphox:mini logged in the background. The phyphox:mini only sends while the measurement runs.">
             </info>
-            <button label="Request all data">
+            <dropdown label="Time range" default="0">
+                <output>max_age_minutes</output>
+                <map value="60">last 60 min</map>
+                <map value="1440">last 24 h</map>
+                <map value="10080">last week</map>
+                <map value="0">all data</map>
+            </dropdown>
+            <button label="Request data">
                 <input type="empty" />
                 <output>time</output>
                 <input type="empty" />
@@ -67,53 +112,12 @@
                 <input type="empty" />
                 <output>humidity</output>
                 <input type="empty" />
-                <output>pressure</output>            
-                <input type="value">0</input>
-                <output>max_age_lo</output>
-                <input type="value">0</input>
-                <output>max_age_hi</output>
-                <input type="value">2</input>
-                <output>cmd_dump</output>
-                <trigger>setConfig</trigger>
+                <output>pressure</output>
+                <trigger>dump</trigger>
             </button>
-            <button label="Request last 24h">
-                <input type="empty" />
-                <output>time</output>
-                <input type="empty" />
-                <output>co2</output>
-                <input type="empty" />
-                <output>temperature</output>
-                <input type="empty" />
-                <output>humidity</output>
-                <input type="empty" />
-                <output>pressure</output>            
-                <input type="value">160</input>
-                <output>max_age_lo</output>
-                <input type="value">5</input>
-                <output>max_age_hi</output>
-                <input type="value">2</input>
-                <output>cmd_dump</output>
-                <trigger>setConfig</trigger>
-            </button>
-            <button label="Request last hour">
-                <input type="empty" />
-                <output>time</output>
-                <input type="empty" />
-                <output>co2</output>
-                <input type="empty" />
-                <output>temperature</output>
-                <input type="empty" />
-                <output>humidity</output>
-                <input type="empty" />
-                <output>pressure</output>            
-                <input type="value">60</input>
-                <output>max_age_lo</output>
-                <input type="value">0</input>
-                <output>max_age_hi</output>
-                <input type="value">2</input>
-                <output>cmd_dump</output>
-                <trigger>setConfig</trigger>
-            </button>
+            <value label="Records received" precision="0">
+                <input>n_records</input>
+            </value>
             
             <graph label="CO₂" timeOnX="true" labelX="time" unitX="s" labelY="CO₂" unitY="ppm" partialUpdate="true" hideTimeMarkers="true" systemTime="true">
                 <input axis="x">time</input>
@@ -132,6 +136,38 @@
                 <input axis="y">pressure</input>
             </graph>
         </view>
+        <view label="Status">
+            <info label="Current settings on the phyphox:mini. They are read when the measurement starts (▶).">
+            </info>
+            <value label="Logging">
+                <input>dev_running</input>
+                <map min="-0.5" max="0.5">stopped</map>
+                <map min="0.5" max="1.5">running</map>
+            </value>
+            <value label="Logged: CO₂">
+                <input>dev_co2</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: temperature">
+                <input>dev_temperature</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: humidity">
+                <input>dev_humidity</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: pressure">
+                <input>dev_pressure</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Interval" precision="0" unit="s">
+                <input>dev_interval</input>
+            </value>
+        </view>
     </views>
 
     <analysis>
@@ -143,6 +179,26 @@
             <input clear="false">max_age_minutes</input>
             <input clear="false">max_age_lo</input>
             <output clear="false">max_age_hi</output>
+        </formula>
+        <count>
+            <input as="buffer" clear="false">time</input>
+            <output as="count">n_records</output>
+        </count>
+        <formula formula="([1]%2-[1]%1)/1">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_co2</output>
+        </formula>
+        <formula formula="([1]%4-[1]%2)/2">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_temperature</output>
+        </formula>
+        <formula formula="([1]%8-[1]%4)/4">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_humidity</output>
+        </formula>
+        <formula formula="([1]%16-[1]%8)/8">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_pressure</output>
         </formula>
     </analysis>
 

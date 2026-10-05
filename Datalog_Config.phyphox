@@ -18,6 +18,18 @@
             <string original="Start logging">Aufzeichnung starten</string>
             <string original="Stop logging">Aufzeichnung stoppen</string>
             <string original="Erase log">Aufzeichnung löschen</string>
+            <string original="Current settings on the phyphox:mini. They are read from the phyphox:mini once per second while the measurement runs (▶).">Aktuelle Einstellungen auf dem phyphox:mini. Sie werden jede Sekunde vom phyphox:mini gelesen, solange die Messung läuft (▶).</string>
+            <string original="Logging">Aufzeichnung</string>
+            <string original="running">läuft</string>
+            <string original="stopped">gestoppt</string>
+            <string original="Logged: CO₂">Aufgezeichnet: CO₂</string>
+            <string original="Logged: temperature">Aufgezeichnet: Temperatur</string>
+            <string original="Logged: humidity">Aufgezeichnet: Feuchtigkeit</string>
+            <string original="Logged: pressure">Aufgezeichnet: Luftdruck</string>
+            <string original="yes">ja</string>
+            <string original="no">nein</string>
+            <string original="Interval">Intervall</string>
+            <string original="New settings">Neue Einstellungen</string>
             <string original="Choose which quantities to log in the background and at which interval. Note: changing the selection of quantities compared to the last logging run erases the previously logged data (phyphox:mini needs a fixed record layout).">Wähle aus, welche Größen im Hintergrund aufgezeichnet werden sollen und in welchem Intervall. Hinweis: Wird die Auswahl der Größen gegenüber der letzten Aufzeichnung geändert, werden die zuvor aufgezeichneten Daten gelöscht (phyphox:mini benötigt ein festes Datenformat).</string>
             <string original="Warning: pressing &quot;Erase log&quot; or starting logging with a different quantity selection than before permanently deletes the previously logged data.">Warnung: Ein Tippen auf "Aufzeichnung löschen" oder das Starten einer Aufzeichnung mit einer anderen Auswahl an Größen als zuvor löscht die bisher aufgezeichneten Daten endgültig.</string>
         </translation>
@@ -34,22 +46,86 @@
         <container size="1" static="false" init="60" clearGroup="_">interval_lo</container>
         <container size="1" static="false" init="0" clearGroup="_">interval_hi</container>
 
-        <container size="1" static="false" init="0" clearGroup="_">cmd</container>
+        <!-- Read back from the phyphox:mini (see <input>), empty until the first read. -->
+        <container size="1">dev_running</container>
+        <container size="1">dev_mask</container>
+        <container size="1">dev_interval</container>
+        <container size="1">dev_co2</container>
+        <container size="1">dev_temperature</container>
+        <container size="1">dev_humidity</container>
+        <container size="1">dev_pressure</container>
+
+        <!-- Fixed command per button (see the triggerIds in <output>): pressing
+             a button writes nothing, it only triggers its own set. Buttons that
+             wrote the command while triggering raced the send in phyphox:
+             "Start logging" arrived as the stop command (seen on a phyphox:mini).
+             Mask and interval come from the formulas below, long before a press. -->
+        <container size="1" static="true" init="1">cmd_start</container>
+        <container size="1" static="true" init="0">cmd_stop</container>
+        <container size="1" static="true" init="3">cmd_erase</container>
     </data-containers>
 
     <input>
+        <!-- Reading the config characteristic returns the settings in effect:
+             byte 0 running, byte 1 sensor mask, bytes 2-3 interval in s. -->
+        <bluetooth id="phyphox:mini" name="phyphox:mini" mode="poll" rate="1">
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="0" length="1" conversion="singleByte">dev_running</output>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="1" length="1" conversion="singleByte">dev_mask</output>
+            <output char="cddf1011-30f7-4671-8b43-5e40ba53514a" offset="2" length="2" conversion="uint16LittleEndian">dev_interval</output>
+        </bluetooth>
     </input>
     <output>
         <bluetooth id="phyphox:mini" name="phyphox:mini">
-            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="setConfig">cmd</input>
-            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="setConfig">mask</input>
-            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="setConfig">interval_lo</input>
-            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="setConfig">interval_hi</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="log_start">cmd_start</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="log_start">mask</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="log_start">interval_lo</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="log_start">interval_hi</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="log_stop">cmd_stop</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="log_stop">mask</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="log_stop">interval_lo</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="log_stop">interval_hi</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="log_erase">cmd_erase</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="log_erase">mask</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="log_erase">interval_lo</input>
+            <input keep="true" char="cddf1011-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="log_erase">interval_hi</input>
         </bluetooth>
     </output>
 
     <views>
         <view label="Settings">
+            <info label="Current settings on the phyphox:mini. They are read from the phyphox:mini once per second while the measurement runs (▶).">
+            </info>
+            <value label="Logging">
+                <input>dev_running</input>
+                <map min="-0.5" max="0.5">stopped</map>
+                <map min="0.5" max="1.5">running</map>
+            </value>
+            <value label="Logged: CO₂">
+                <input>dev_co2</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: temperature">
+                <input>dev_temperature</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: humidity">
+                <input>dev_humidity</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Logged: pressure">
+                <input>dev_pressure</input>
+                <map min="-0.5" max="0.5">no</map>
+                <map min="0.5" max="1.5">yes</map>
+            </value>
+            <value label="Interval" precision="0" unit="s">
+                <input>dev_interval</input>
+            </value>
+            <separator height="1" />
+            <info label="New settings" bold="true">
+            </info>
             <info label="Choose which quantities to log in the background and at which interval. Note: changing the selection of quantities compared to the last logging run erases the previously logged data (phyphox:mini needs a fixed record layout).">
             </info>
 
@@ -71,22 +147,16 @@
             </edit>
 
             <button label="Start logging">
-                <input type="value">1</input>
-                <output>cmd</output>
-				<trigger>setConfig</trigger>
+                <trigger>log_start</trigger>
             </button>
 
             <info label="Warning: pressing &quot;Erase log&quot; or starting logging with a different quantity selection than before permanently deletes the previously logged data.">
             </info>
             <button label="Stop logging">
-                <input type="value">0</input>
-                <output>cmd</output>
-				<trigger>setConfig</trigger>                
+                <trigger>log_stop</trigger>
             </button>
             <button label="Erase log">
-                <input type="value">3</input>
-                <output>cmd</output>
-				<trigger>setConfig</trigger>                
+                <trigger>log_erase</trigger>
             </button>
         </view>
     </views>
@@ -107,6 +177,22 @@
             <input clear="false">interval_s</input>
             <input clear="false">interval_lo</input>
             <output clear="false">interval_hi</output>
+        </formula>
+        <formula formula="([1]%2-[1]%1)/1">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_co2</output>
+        </formula>
+        <formula formula="([1]%4-[1]%2)/2">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_temperature</output>
+        </formula>
+        <formula formula="([1]%8-[1]%4)/4">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_humidity</output>
+        </formula>
+        <formula formula="([1]%16-[1]%8)/8">
+            <input clear="false">dev_mask</input>
+            <output clear="false">dev_pressure</output>
         </formula>
     </analysis>
 
