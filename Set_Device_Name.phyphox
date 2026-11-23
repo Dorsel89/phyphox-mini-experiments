@@ -3,51 +3,59 @@
     <category>phyphox:mini settings</category>
     <color>ADEBB3</color>
     <icon format="base64">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</icon>
-    <description>Sets a custom 4-character Bluetooth advertising name ("phyphox:mini XXXX") on the connected phyphox:mini. The board restarts automatically right after applying the new name.</description>
+    <description>Sets a custom 4-character Bluetooth name ("phyphox:mini XXXX") on the connected phyphox:mini. The name is stored on the phyphox:mini and shows up in the Bluetooth search after disconnecting. Requires firmware 2.0 or newer.</description>
 
     <translations>
         <translation locale="de">
             <title>Gerätename festlegen</title>
             <category>phyphox:mini Einstellungen</category>
-            <description>Legt einen benutzerdefinierten, 4-stelligen Bluetooth-Namen ("phyphox:mini XXXX") auf dem verbundenen phyphox:mini fest. Das Board startet nach dem Übernehmen automatisch neu.</description>
-            <string original="Set device name (Letters &amp; Digits)">Gerätename festlegen (Buchstaben &amp; Ziffern)</string>
-            <string original="Set device name (Full ASCII)">Gerätename festlegen (voller ASCII-Bereich)</string>
-            <string original="Choose 4 characters. The device name will be 'phyphox:mini XXXX'. After applying, the board restarts immediately and disconnects.">Wähle 4 Zeichen. Der Gerätename wird 'phyphox:mini XXXX' lauten. Nach dem Übernehmen startet das Board sofort neu und trennt die Verbindung.</string>
-            <string original="Choose any of the 256 byte values as characters. Non-printable/extended values are shown as their hex code and may not display correctly everywhere.">Wähle einen beliebigen der 256 Byte-Werte als Zeichen. Nicht druckbare/erweiterte Werte werden als Hex-Code angezeigt und werden eventuell nicht überall korrekt dargestellt.</string>
+            <description>Legt einen eigenen, 4-stelligen Bluetooth-Namen ("phyphox:mini XXXX") auf dem verbundenen phyphox:mini fest. Der Name wird auf dem phyphox:mini gespeichert und erscheint nach dem Trennen in der Bluetooth-Suche. Benötigt Firmware 2.0 oder neuer.</description>
+            <string original="Set device name (letters &amp; digits)">Gerätename festlegen (Buchstaben &amp; Ziffern)</string>
+            <string original="Set device name (all characters)">Gerätename festlegen (alle Zeichen)</string>
+            <string original="Choose 4 characters. The device name will be 'phyphox:mini XXXX'. Start the measurement (▶) first, then tap 'Apply name'. The phyphox:mini stays connected; the new name shows up in the Bluetooth search as soon as you leave this experiment.">Wähle 4 Zeichen. Der Gerätename lautet dann 'phyphox:mini XXXX'. Starte zuerst die Messung (▶) und tippe dann auf 'Namen übernehmen'. Der phyphox:mini bleibt verbunden; der neue Name erscheint in der Bluetooth-Suche, sobald du dieses Experiment verlässt.</string>
+            <string original="Same as the first tab, but with all printable ASCII characters (lower case, punctuation). Both tabs set the same 4 characters.">Wie der erste Reiter, aber mit allen druckbaren ASCII-Zeichen (Kleinbuchstaben, Satzzeichen). Beide Reiter stellen dieselben 4 Zeichen ein.</string>
+            <string original="'Reset to factory default name' removes the custom name. The phyphox:mini then uses the name it was delivered with again (letter and number, e.g. A19).">'Auf Werksnamen zurücksetzen' entfernt den eigenen Namen. Der phyphox:mini verwendet dann wieder den Namen, mit dem er ausgeliefert wurde (Buchstabe und Nummer, z. B. A19).</string>
             <string original="1st character">1. Zeichen</string>
             <string original="2nd character">2. Zeichen</string>
             <string original="3rd character">3. Zeichen</string>
             <string original="4th character">4. Zeichen</string>
-            <string original="Apply name (board will restart)">Namen übernehmen (Board startet neu)</string>
+            <string original="Space">Leerzeichen</string>
+            <string original="Apply name">Namen übernehmen</string>
             <string original="Reset to factory default name">Auf Werksnamen zurücksetzen</string>
         </translation>
     </translations>
 
     <data-containers>
-        <container size="1" static="false" init="0">unused</container>
+        <!-- The four characters, set by the dropdowns long before a button is pressed. -->
+        <container size="1" static="false" init="78" clearGroup="_">char1_code</container>
+        <container size="1" static="false" init="65" clearGroup="_">char2_code</container>
+        <container size="1" static="false" init="77" clearGroup="_">char3_code</container>
+        <container size="1" static="false" init="69" clearGroup="_">char4_code</container>
 
-        <container size="1" static="false" init="2">cmd_out</container>
-        <container size="1" static="false" init="78">char1_code</container>
-        <container size="1" static="false" init="65">char2_code</container>
-        <container size="1" static="false" init="77">char3_code</container>
-        <container size="1" static="false" init="69">char4_code</container>
+        <!-- Command 0x03 of the device settings (firmware v2): name in normal
+             order. Fixed container, the buttons only trigger a send (a button
+             that also writes the values it sends races the send in phyphox). -->
+        <container size="1" static="true" init="3">cmd_name</container>
     </data-containers>
 
     <input>
     </input>
     <output>
         <bluetooth id="phyphox:mini" name="phyphox:mini">
-            <input keep="false" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="setName">cmd_out</input>
-            <input keep="false" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="setName">char4_code</input>
-            <input keep="false" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="setName">char3_code</input>
-            <input keep="false" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="setName">char2_code</input>
-            <input keep="false" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="4" triggerId="setName">char1_code</input>
+            <!-- Apply: 03 c1 c2 c3 c4 -->
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="setName">cmd_name</input>
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="1" triggerId="setName">char1_code</input>
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="2" triggerId="setName">char2_code</input>
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="3" triggerId="setName">char3_code</input>
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="4" triggerId="setName">char4_code</input>
+            <!-- Reset: 03 without characters restores the default name -->
+            <input keep="true" char="cddf1022-30f7-4671-8b43-5e40ba53514a" length="1" conversion="singleByte" offset="0" triggerId="resetName">cmd_name</input>
         </bluetooth>
     </output>
 
     <views>
-        <view label="Set device name (Letters &amp; Digits)">
-            <info label="Choose 4 characters. The device name will be 'phyphox:mini XXXX'. After applying, the board restarts immediately and disconnects."/>
+        <view label="Set device name (letters &amp; digits)">
+            <info label="Choose 4 characters. The device name will be 'phyphox:mini XXXX'. Start the measurement (▶) first, then tap 'Apply name'. The phyphox:mini stays connected; the new name shows up in the Bluetooth search as soon as you leave this experiment."/>
 
             <dropdown label="1st character" default="78">
                 <output>char1_code</output>
@@ -213,65 +221,23 @@
                 <map value="32">Space</map>
             </dropdown>
 
-            <button label="Apply name (board will restart)">
-                <input type="value">2</input>
-                <output>cmd_out</output>
+            <button label="Apply name">
                 <trigger>setName</trigger>
             </button>
 
+            <separator height="1" />
+            <info label="'Reset to factory default name' removes the custom name. The phyphox:mini then uses the name it was delivered with again (letter and number, e.g. A19)."/>
             <button label="Reset to factory default name">
-                <input type="value">2</input>
-                <output>cmd_out</output>
-                <input type="value">255</input>
-                <output>char1_code</output>
-                <input type="value">255</input>
-                <output>char2_code</output>
-                <input type="value">255</input>
-                <output>char3_code</output>
-                <input type="value">255</input>
-                <output>char4_code</output>
-                <trigger>setName</trigger>
+                <trigger>resetName</trigger>
             </button>
         </view>
 
-        <view label="Set device name (Full ASCII)">
-            <info label="Choose any of the 256 byte values as characters. Non-printable/extended values are shown as their hex code and may not display correctly everywhere."/>
+        <view label="Set device name (all characters)">
+            <info label="Same as the first tab, but with all printable ASCII characters (lower case, punctuation). Both tabs set the same 4 characters."/>
 
             <dropdown label="1st character" default="78">
                 <output>char1_code</output>
-                <map value="0">0x00 (NUL)</map>
-                <map value="1">0x01 (SOH)</map>
-                <map value="2">0x02 (STX)</map>
-                <map value="3">0x03 (ETX)</map>
-                <map value="4">0x04 (EOT)</map>
-                <map value="5">0x05 (ENQ)</map>
-                <map value="6">0x06 (ACK)</map>
-                <map value="7">0x07 (BEL)</map>
-                <map value="8">0x08 (BS)</map>
-                <map value="9">0x09 (TAB)</map>
-                <map value="10">0x0A (LF)</map>
-                <map value="11">0x0B (VT)</map>
-                <map value="12">0x0C (FF)</map>
-                <map value="13">0x0D (CR)</map>
-                <map value="14">0x0E (SO)</map>
-                <map value="15">0x0F (SI)</map>
-                <map value="16">0x10 (DLE)</map>
-                <map value="17">0x11 (DC1)</map>
-                <map value="18">0x12 (DC2)</map>
-                <map value="19">0x13 (DC3)</map>
-                <map value="20">0x14 (DC4)</map>
-                <map value="21">0x15 (NAK)</map>
-                <map value="22">0x16 (SYN)</map>
-                <map value="23">0x17 (ETB)</map>
-                <map value="24">0x18 (CAN)</map>
-                <map value="25">0x19 (EM)</map>
-                <map value="26">0x1A (SUB)</map>
-                <map value="27">0x1B (ESC)</map>
-                <map value="28">0x1C (FS)</map>
-                <map value="29">0x1D (GS)</map>
-                <map value="30">0x1E (RS)</map>
-                <map value="31">0x1F (US)</map>
-                <map value="32">0x20 (Space)</map>
+                <map value="32">Space</map>
                 <map value="33">!</map>
                 <map value="34">"</map>
                 <map value="35">#</map>
@@ -366,172 +332,11 @@
                 <map value="124">|</map>
                 <map value="125">}</map>
                 <map value="126">~</map>
-                <map value="127">0x7F (DEL)</map>
-                <map value="128">0x80</map>
-                <map value="129">0x81</map>
-                <map value="130">0x82</map>
-                <map value="131">0x83</map>
-                <map value="132">0x84</map>
-                <map value="133">0x85</map>
-                <map value="134">0x86</map>
-                <map value="135">0x87</map>
-                <map value="136">0x88</map>
-                <map value="137">0x89</map>
-                <map value="138">0x8A</map>
-                <map value="139">0x8B</map>
-                <map value="140">0x8C</map>
-                <map value="141">0x8D</map>
-                <map value="142">0x8E</map>
-                <map value="143">0x8F</map>
-                <map value="144">0x90</map>
-                <map value="145">0x91</map>
-                <map value="146">0x92</map>
-                <map value="147">0x93</map>
-                <map value="148">0x94</map>
-                <map value="149">0x95</map>
-                <map value="150">0x96</map>
-                <map value="151">0x97</map>
-                <map value="152">0x98</map>
-                <map value="153">0x99</map>
-                <map value="154">0x9A</map>
-                <map value="155">0x9B</map>
-                <map value="156">0x9C</map>
-                <map value="157">0x9D</map>
-                <map value="158">0x9E</map>
-                <map value="159">0x9F</map>
-                <map value="160">0xA0</map>
-                <map value="161">0xA1</map>
-                <map value="162">0xA2</map>
-                <map value="163">0xA3</map>
-                <map value="164">0xA4</map>
-                <map value="165">0xA5</map>
-                <map value="166">0xA6</map>
-                <map value="167">0xA7</map>
-                <map value="168">0xA8</map>
-                <map value="169">0xA9</map>
-                <map value="170">0xAA</map>
-                <map value="171">0xAB</map>
-                <map value="172">0xAC</map>
-                <map value="173">0xAD</map>
-                <map value="174">0xAE</map>
-                <map value="175">0xAF</map>
-                <map value="176">0xB0</map>
-                <map value="177">0xB1</map>
-                <map value="178">0xB2</map>
-                <map value="179">0xB3</map>
-                <map value="180">0xB4</map>
-                <map value="181">0xB5</map>
-                <map value="182">0xB6</map>
-                <map value="183">0xB7</map>
-                <map value="184">0xB8</map>
-                <map value="185">0xB9</map>
-                <map value="186">0xBA</map>
-                <map value="187">0xBB</map>
-                <map value="188">0xBC</map>
-                <map value="189">0xBD</map>
-                <map value="190">0xBE</map>
-                <map value="191">0xBF</map>
-                <map value="192">0xC0</map>
-                <map value="193">0xC1</map>
-                <map value="194">0xC2</map>
-                <map value="195">0xC3</map>
-                <map value="196">0xC4</map>
-                <map value="197">0xC5</map>
-                <map value="198">0xC6</map>
-                <map value="199">0xC7</map>
-                <map value="200">0xC8</map>
-                <map value="201">0xC9</map>
-                <map value="202">0xCA</map>
-                <map value="203">0xCB</map>
-                <map value="204">0xCC</map>
-                <map value="205">0xCD</map>
-                <map value="206">0xCE</map>
-                <map value="207">0xCF</map>
-                <map value="208">0xD0</map>
-                <map value="209">0xD1</map>
-                <map value="210">0xD2</map>
-                <map value="211">0xD3</map>
-                <map value="212">0xD4</map>
-                <map value="213">0xD5</map>
-                <map value="214">0xD6</map>
-                <map value="215">0xD7</map>
-                <map value="216">0xD8</map>
-                <map value="217">0xD9</map>
-                <map value="218">0xDA</map>
-                <map value="219">0xDB</map>
-                <map value="220">0xDC</map>
-                <map value="221">0xDD</map>
-                <map value="222">0xDE</map>
-                <map value="223">0xDF</map>
-                <map value="224">0xE0</map>
-                <map value="225">0xE1</map>
-                <map value="226">0xE2</map>
-                <map value="227">0xE3</map>
-                <map value="228">0xE4</map>
-                <map value="229">0xE5</map>
-                <map value="230">0xE6</map>
-                <map value="231">0xE7</map>
-                <map value="232">0xE8</map>
-                <map value="233">0xE9</map>
-                <map value="234">0xEA</map>
-                <map value="235">0xEB</map>
-                <map value="236">0xEC</map>
-                <map value="237">0xED</map>
-                <map value="238">0xEE</map>
-                <map value="239">0xEF</map>
-                <map value="240">0xF0</map>
-                <map value="241">0xF1</map>
-                <map value="242">0xF2</map>
-                <map value="243">0xF3</map>
-                <map value="244">0xF4</map>
-                <map value="245">0xF5</map>
-                <map value="246">0xF6</map>
-                <map value="247">0xF7</map>
-                <map value="248">0xF8</map>
-                <map value="249">0xF9</map>
-                <map value="250">0xFA</map>
-                <map value="251">0xFB</map>
-                <map value="252">0xFC</map>
-                <map value="253">0xFD</map>
-                <map value="254">0xFE</map>
-                <map value="255">0xFF</map>
             </dropdown>
 
             <dropdown label="2nd character" default="65">
                 <output>char2_code</output>
-                <map value="0">0x00 (NUL)</map>
-                <map value="1">0x01 (SOH)</map>
-                <map value="2">0x02 (STX)</map>
-                <map value="3">0x03 (ETX)</map>
-                <map value="4">0x04 (EOT)</map>
-                <map value="5">0x05 (ENQ)</map>
-                <map value="6">0x06 (ACK)</map>
-                <map value="7">0x07 (BEL)</map>
-                <map value="8">0x08 (BS)</map>
-                <map value="9">0x09 (TAB)</map>
-                <map value="10">0x0A (LF)</map>
-                <map value="11">0x0B (VT)</map>
-                <map value="12">0x0C (FF)</map>
-                <map value="13">0x0D (CR)</map>
-                <map value="14">0x0E (SO)</map>
-                <map value="15">0x0F (SI)</map>
-                <map value="16">0x10 (DLE)</map>
-                <map value="17">0x11 (DC1)</map>
-                <map value="18">0x12 (DC2)</map>
-                <map value="19">0x13 (DC3)</map>
-                <map value="20">0x14 (DC4)</map>
-                <map value="21">0x15 (NAK)</map>
-                <map value="22">0x16 (SYN)</map>
-                <map value="23">0x17 (ETB)</map>
-                <map value="24">0x18 (CAN)</map>
-                <map value="25">0x19 (EM)</map>
-                <map value="26">0x1A (SUB)</map>
-                <map value="27">0x1B (ESC)</map>
-                <map value="28">0x1C (FS)</map>
-                <map value="29">0x1D (GS)</map>
-                <map value="30">0x1E (RS)</map>
-                <map value="31">0x1F (US)</map>
-                <map value="32">0x20 (Space)</map>
+                <map value="32">Space</map>
                 <map value="33">!</map>
                 <map value="34">"</map>
                 <map value="35">#</map>
@@ -626,172 +431,11 @@
                 <map value="124">|</map>
                 <map value="125">}</map>
                 <map value="126">~</map>
-                <map value="127">0x7F (DEL)</map>
-                <map value="128">0x80</map>
-                <map value="129">0x81</map>
-                <map value="130">0x82</map>
-                <map value="131">0x83</map>
-                <map value="132">0x84</map>
-                <map value="133">0x85</map>
-                <map value="134">0x86</map>
-                <map value="135">0x87</map>
-                <map value="136">0x88</map>
-                <map value="137">0x89</map>
-                <map value="138">0x8A</map>
-                <map value="139">0x8B</map>
-                <map value="140">0x8C</map>
-                <map value="141">0x8D</map>
-                <map value="142">0x8E</map>
-                <map value="143">0x8F</map>
-                <map value="144">0x90</map>
-                <map value="145">0x91</map>
-                <map value="146">0x92</map>
-                <map value="147">0x93</map>
-                <map value="148">0x94</map>
-                <map value="149">0x95</map>
-                <map value="150">0x96</map>
-                <map value="151">0x97</map>
-                <map value="152">0x98</map>
-                <map value="153">0x99</map>
-                <map value="154">0x9A</map>
-                <map value="155">0x9B</map>
-                <map value="156">0x9C</map>
-                <map value="157">0x9D</map>
-                <map value="158">0x9E</map>
-                <map value="159">0x9F</map>
-                <map value="160">0xA0</map>
-                <map value="161">0xA1</map>
-                <map value="162">0xA2</map>
-                <map value="163">0xA3</map>
-                <map value="164">0xA4</map>
-                <map value="165">0xA5</map>
-                <map value="166">0xA6</map>
-                <map value="167">0xA7</map>
-                <map value="168">0xA8</map>
-                <map value="169">0xA9</map>
-                <map value="170">0xAA</map>
-                <map value="171">0xAB</map>
-                <map value="172">0xAC</map>
-                <map value="173">0xAD</map>
-                <map value="174">0xAE</map>
-                <map value="175">0xAF</map>
-                <map value="176">0xB0</map>
-                <map value="177">0xB1</map>
-                <map value="178">0xB2</map>
-                <map value="179">0xB3</map>
-                <map value="180">0xB4</map>
-                <map value="181">0xB5</map>
-                <map value="182">0xB6</map>
-                <map value="183">0xB7</map>
-                <map value="184">0xB8</map>
-                <map value="185">0xB9</map>
-                <map value="186">0xBA</map>
-                <map value="187">0xBB</map>
-                <map value="188">0xBC</map>
-                <map value="189">0xBD</map>
-                <map value="190">0xBE</map>
-                <map value="191">0xBF</map>
-                <map value="192">0xC0</map>
-                <map value="193">0xC1</map>
-                <map value="194">0xC2</map>
-                <map value="195">0xC3</map>
-                <map value="196">0xC4</map>
-                <map value="197">0xC5</map>
-                <map value="198">0xC6</map>
-                <map value="199">0xC7</map>
-                <map value="200">0xC8</map>
-                <map value="201">0xC9</map>
-                <map value="202">0xCA</map>
-                <map value="203">0xCB</map>
-                <map value="204">0xCC</map>
-                <map value="205">0xCD</map>
-                <map value="206">0xCE</map>
-                <map value="207">0xCF</map>
-                <map value="208">0xD0</map>
-                <map value="209">0xD1</map>
-                <map value="210">0xD2</map>
-                <map value="211">0xD3</map>
-                <map value="212">0xD4</map>
-                <map value="213">0xD5</map>
-                <map value="214">0xD6</map>
-                <map value="215">0xD7</map>
-                <map value="216">0xD8</map>
-                <map value="217">0xD9</map>
-                <map value="218">0xDA</map>
-                <map value="219">0xDB</map>
-                <map value="220">0xDC</map>
-                <map value="221">0xDD</map>
-                <map value="222">0xDE</map>
-                <map value="223">0xDF</map>
-                <map value="224">0xE0</map>
-                <map value="225">0xE1</map>
-                <map value="226">0xE2</map>
-                <map value="227">0xE3</map>
-                <map value="228">0xE4</map>
-                <map value="229">0xE5</map>
-                <map value="230">0xE6</map>
-                <map value="231">0xE7</map>
-                <map value="232">0xE8</map>
-                <map value="233">0xE9</map>
-                <map value="234">0xEA</map>
-                <map value="235">0xEB</map>
-                <map value="236">0xEC</map>
-                <map value="237">0xED</map>
-                <map value="238">0xEE</map>
-                <map value="239">0xEF</map>
-                <map value="240">0xF0</map>
-                <map value="241">0xF1</map>
-                <map value="242">0xF2</map>
-                <map value="243">0xF3</map>
-                <map value="244">0xF4</map>
-                <map value="245">0xF5</map>
-                <map value="246">0xF6</map>
-                <map value="247">0xF7</map>
-                <map value="248">0xF8</map>
-                <map value="249">0xF9</map>
-                <map value="250">0xFA</map>
-                <map value="251">0xFB</map>
-                <map value="252">0xFC</map>
-                <map value="253">0xFD</map>
-                <map value="254">0xFE</map>
-                <map value="255">0xFF</map>
             </dropdown>
 
             <dropdown label="3rd character" default="77">
                 <output>char3_code</output>
-                <map value="0">0x00 (NUL)</map>
-                <map value="1">0x01 (SOH)</map>
-                <map value="2">0x02 (STX)</map>
-                <map value="3">0x03 (ETX)</map>
-                <map value="4">0x04 (EOT)</map>
-                <map value="5">0x05 (ENQ)</map>
-                <map value="6">0x06 (ACK)</map>
-                <map value="7">0x07 (BEL)</map>
-                <map value="8">0x08 (BS)</map>
-                <map value="9">0x09 (TAB)</map>
-                <map value="10">0x0A (LF)</map>
-                <map value="11">0x0B (VT)</map>
-                <map value="12">0x0C (FF)</map>
-                <map value="13">0x0D (CR)</map>
-                <map value="14">0x0E (SO)</map>
-                <map value="15">0x0F (SI)</map>
-                <map value="16">0x10 (DLE)</map>
-                <map value="17">0x11 (DC1)</map>
-                <map value="18">0x12 (DC2)</map>
-                <map value="19">0x13 (DC3)</map>
-                <map value="20">0x14 (DC4)</map>
-                <map value="21">0x15 (NAK)</map>
-                <map value="22">0x16 (SYN)</map>
-                <map value="23">0x17 (ETB)</map>
-                <map value="24">0x18 (CAN)</map>
-                <map value="25">0x19 (EM)</map>
-                <map value="26">0x1A (SUB)</map>
-                <map value="27">0x1B (ESC)</map>
-                <map value="28">0x1C (FS)</map>
-                <map value="29">0x1D (GS)</map>
-                <map value="30">0x1E (RS)</map>
-                <map value="31">0x1F (US)</map>
-                <map value="32">0x20 (Space)</map>
+                <map value="32">Space</map>
                 <map value="33">!</map>
                 <map value="34">"</map>
                 <map value="35">#</map>
@@ -886,172 +530,11 @@
                 <map value="124">|</map>
                 <map value="125">}</map>
                 <map value="126">~</map>
-                <map value="127">0x7F (DEL)</map>
-                <map value="128">0x80</map>
-                <map value="129">0x81</map>
-                <map value="130">0x82</map>
-                <map value="131">0x83</map>
-                <map value="132">0x84</map>
-                <map value="133">0x85</map>
-                <map value="134">0x86</map>
-                <map value="135">0x87</map>
-                <map value="136">0x88</map>
-                <map value="137">0x89</map>
-                <map value="138">0x8A</map>
-                <map value="139">0x8B</map>
-                <map value="140">0x8C</map>
-                <map value="141">0x8D</map>
-                <map value="142">0x8E</map>
-                <map value="143">0x8F</map>
-                <map value="144">0x90</map>
-                <map value="145">0x91</map>
-                <map value="146">0x92</map>
-                <map value="147">0x93</map>
-                <map value="148">0x94</map>
-                <map value="149">0x95</map>
-                <map value="150">0x96</map>
-                <map value="151">0x97</map>
-                <map value="152">0x98</map>
-                <map value="153">0x99</map>
-                <map value="154">0x9A</map>
-                <map value="155">0x9B</map>
-                <map value="156">0x9C</map>
-                <map value="157">0x9D</map>
-                <map value="158">0x9E</map>
-                <map value="159">0x9F</map>
-                <map value="160">0xA0</map>
-                <map value="161">0xA1</map>
-                <map value="162">0xA2</map>
-                <map value="163">0xA3</map>
-                <map value="164">0xA4</map>
-                <map value="165">0xA5</map>
-                <map value="166">0xA6</map>
-                <map value="167">0xA7</map>
-                <map value="168">0xA8</map>
-                <map value="169">0xA9</map>
-                <map value="170">0xAA</map>
-                <map value="171">0xAB</map>
-                <map value="172">0xAC</map>
-                <map value="173">0xAD</map>
-                <map value="174">0xAE</map>
-                <map value="175">0xAF</map>
-                <map value="176">0xB0</map>
-                <map value="177">0xB1</map>
-                <map value="178">0xB2</map>
-                <map value="179">0xB3</map>
-                <map value="180">0xB4</map>
-                <map value="181">0xB5</map>
-                <map value="182">0xB6</map>
-                <map value="183">0xB7</map>
-                <map value="184">0xB8</map>
-                <map value="185">0xB9</map>
-                <map value="186">0xBA</map>
-                <map value="187">0xBB</map>
-                <map value="188">0xBC</map>
-                <map value="189">0xBD</map>
-                <map value="190">0xBE</map>
-                <map value="191">0xBF</map>
-                <map value="192">0xC0</map>
-                <map value="193">0xC1</map>
-                <map value="194">0xC2</map>
-                <map value="195">0xC3</map>
-                <map value="196">0xC4</map>
-                <map value="197">0xC5</map>
-                <map value="198">0xC6</map>
-                <map value="199">0xC7</map>
-                <map value="200">0xC8</map>
-                <map value="201">0xC9</map>
-                <map value="202">0xCA</map>
-                <map value="203">0xCB</map>
-                <map value="204">0xCC</map>
-                <map value="205">0xCD</map>
-                <map value="206">0xCE</map>
-                <map value="207">0xCF</map>
-                <map value="208">0xD0</map>
-                <map value="209">0xD1</map>
-                <map value="210">0xD2</map>
-                <map value="211">0xD3</map>
-                <map value="212">0xD4</map>
-                <map value="213">0xD5</map>
-                <map value="214">0xD6</map>
-                <map value="215">0xD7</map>
-                <map value="216">0xD8</map>
-                <map value="217">0xD9</map>
-                <map value="218">0xDA</map>
-                <map value="219">0xDB</map>
-                <map value="220">0xDC</map>
-                <map value="221">0xDD</map>
-                <map value="222">0xDE</map>
-                <map value="223">0xDF</map>
-                <map value="224">0xE0</map>
-                <map value="225">0xE1</map>
-                <map value="226">0xE2</map>
-                <map value="227">0xE3</map>
-                <map value="228">0xE4</map>
-                <map value="229">0xE5</map>
-                <map value="230">0xE6</map>
-                <map value="231">0xE7</map>
-                <map value="232">0xE8</map>
-                <map value="233">0xE9</map>
-                <map value="234">0xEA</map>
-                <map value="235">0xEB</map>
-                <map value="236">0xEC</map>
-                <map value="237">0xED</map>
-                <map value="238">0xEE</map>
-                <map value="239">0xEF</map>
-                <map value="240">0xF0</map>
-                <map value="241">0xF1</map>
-                <map value="242">0xF2</map>
-                <map value="243">0xF3</map>
-                <map value="244">0xF4</map>
-                <map value="245">0xF5</map>
-                <map value="246">0xF6</map>
-                <map value="247">0xF7</map>
-                <map value="248">0xF8</map>
-                <map value="249">0xF9</map>
-                <map value="250">0xFA</map>
-                <map value="251">0xFB</map>
-                <map value="252">0xFC</map>
-                <map value="253">0xFD</map>
-                <map value="254">0xFE</map>
-                <map value="255">0xFF</map>
             </dropdown>
 
             <dropdown label="4th character" default="69">
                 <output>char4_code</output>
-                <map value="0">0x00 (NUL)</map>
-                <map value="1">0x01 (SOH)</map>
-                <map value="2">0x02 (STX)</map>
-                <map value="3">0x03 (ETX)</map>
-                <map value="4">0x04 (EOT)</map>
-                <map value="5">0x05 (ENQ)</map>
-                <map value="6">0x06 (ACK)</map>
-                <map value="7">0x07 (BEL)</map>
-                <map value="8">0x08 (BS)</map>
-                <map value="9">0x09 (TAB)</map>
-                <map value="10">0x0A (LF)</map>
-                <map value="11">0x0B (VT)</map>
-                <map value="12">0x0C (FF)</map>
-                <map value="13">0x0D (CR)</map>
-                <map value="14">0x0E (SO)</map>
-                <map value="15">0x0F (SI)</map>
-                <map value="16">0x10 (DLE)</map>
-                <map value="17">0x11 (DC1)</map>
-                <map value="18">0x12 (DC2)</map>
-                <map value="19">0x13 (DC3)</map>
-                <map value="20">0x14 (DC4)</map>
-                <map value="21">0x15 (NAK)</map>
-                <map value="22">0x16 (SYN)</map>
-                <map value="23">0x17 (ETB)</map>
-                <map value="24">0x18 (CAN)</map>
-                <map value="25">0x19 (EM)</map>
-                <map value="26">0x1A (SUB)</map>
-                <map value="27">0x1B (ESC)</map>
-                <map value="28">0x1C (FS)</map>
-                <map value="29">0x1D (GS)</map>
-                <map value="30">0x1E (RS)</map>
-                <map value="31">0x1F (US)</map>
-                <map value="32">0x20 (Space)</map>
+                <map value="32">Space</map>
                 <map value="33">!</map>
                 <map value="34">"</map>
                 <map value="35">#</map>
@@ -1146,155 +629,16 @@
                 <map value="124">|</map>
                 <map value="125">}</map>
                 <map value="126">~</map>
-                <map value="127">0x7F (DEL)</map>
-                <map value="128">0x80</map>
-                <map value="129">0x81</map>
-                <map value="130">0x82</map>
-                <map value="131">0x83</map>
-                <map value="132">0x84</map>
-                <map value="133">0x85</map>
-                <map value="134">0x86</map>
-                <map value="135">0x87</map>
-                <map value="136">0x88</map>
-                <map value="137">0x89</map>
-                <map value="138">0x8A</map>
-                <map value="139">0x8B</map>
-                <map value="140">0x8C</map>
-                <map value="141">0x8D</map>
-                <map value="142">0x8E</map>
-                <map value="143">0x8F</map>
-                <map value="144">0x90</map>
-                <map value="145">0x91</map>
-                <map value="146">0x92</map>
-                <map value="147">0x93</map>
-                <map value="148">0x94</map>
-                <map value="149">0x95</map>
-                <map value="150">0x96</map>
-                <map value="151">0x97</map>
-                <map value="152">0x98</map>
-                <map value="153">0x99</map>
-                <map value="154">0x9A</map>
-                <map value="155">0x9B</map>
-                <map value="156">0x9C</map>
-                <map value="157">0x9D</map>
-                <map value="158">0x9E</map>
-                <map value="159">0x9F</map>
-                <map value="160">0xA0</map>
-                <map value="161">0xA1</map>
-                <map value="162">0xA2</map>
-                <map value="163">0xA3</map>
-                <map value="164">0xA4</map>
-                <map value="165">0xA5</map>
-                <map value="166">0xA6</map>
-                <map value="167">0xA7</map>
-                <map value="168">0xA8</map>
-                <map value="169">0xA9</map>
-                <map value="170">0xAA</map>
-                <map value="171">0xAB</map>
-                <map value="172">0xAC</map>
-                <map value="173">0xAD</map>
-                <map value="174">0xAE</map>
-                <map value="175">0xAF</map>
-                <map value="176">0xB0</map>
-                <map value="177">0xB1</map>
-                <map value="178">0xB2</map>
-                <map value="179">0xB3</map>
-                <map value="180">0xB4</map>
-                <map value="181">0xB5</map>
-                <map value="182">0xB6</map>
-                <map value="183">0xB7</map>
-                <map value="184">0xB8</map>
-                <map value="185">0xB9</map>
-                <map value="186">0xBA</map>
-                <map value="187">0xBB</map>
-                <map value="188">0xBC</map>
-                <map value="189">0xBD</map>
-                <map value="190">0xBE</map>
-                <map value="191">0xBF</map>
-                <map value="192">0xC0</map>
-                <map value="193">0xC1</map>
-                <map value="194">0xC2</map>
-                <map value="195">0xC3</map>
-                <map value="196">0xC4</map>
-                <map value="197">0xC5</map>
-                <map value="198">0xC6</map>
-                <map value="199">0xC7</map>
-                <map value="200">0xC8</map>
-                <map value="201">0xC9</map>
-                <map value="202">0xCA</map>
-                <map value="203">0xCB</map>
-                <map value="204">0xCC</map>
-                <map value="205">0xCD</map>
-                <map value="206">0xCE</map>
-                <map value="207">0xCF</map>
-                <map value="208">0xD0</map>
-                <map value="209">0xD1</map>
-                <map value="210">0xD2</map>
-                <map value="211">0xD3</map>
-                <map value="212">0xD4</map>
-                <map value="213">0xD5</map>
-                <map value="214">0xD6</map>
-                <map value="215">0xD7</map>
-                <map value="216">0xD8</map>
-                <map value="217">0xD9</map>
-                <map value="218">0xDA</map>
-                <map value="219">0xDB</map>
-                <map value="220">0xDC</map>
-                <map value="221">0xDD</map>
-                <map value="222">0xDE</map>
-                <map value="223">0xDF</map>
-                <map value="224">0xE0</map>
-                <map value="225">0xE1</map>
-                <map value="226">0xE2</map>
-                <map value="227">0xE3</map>
-                <map value="228">0xE4</map>
-                <map value="229">0xE5</map>
-                <map value="230">0xE6</map>
-                <map value="231">0xE7</map>
-                <map value="232">0xE8</map>
-                <map value="233">0xE9</map>
-                <map value="234">0xEA</map>
-                <map value="235">0xEB</map>
-                <map value="236">0xEC</map>
-                <map value="237">0xED</map>
-                <map value="238">0xEE</map>
-                <map value="239">0xEF</map>
-                <map value="240">0xF0</map>
-                <map value="241">0xF1</map>
-                <map value="242">0xF2</map>
-                <map value="243">0xF3</map>
-                <map value="244">0xF4</map>
-                <map value="245">0xF5</map>
-                <map value="246">0xF6</map>
-                <map value="247">0xF7</map>
-                <map value="248">0xF8</map>
-                <map value="249">0xF9</map>
-                <map value="250">0xFA</map>
-                <map value="251">0xFB</map>
-                <map value="252">0xFC</map>
-                <map value="253">0xFD</map>
-                <map value="254">0xFE</map>
-                <map value="255">0xFF</map>
             </dropdown>
 
-            <button label="Apply name (board will restart)" trigger="setName">
-                <input type="value">2</input>
-                <output>cmd_out</output>
+            <button label="Apply name">
                 <trigger>setName</trigger>
             </button>
 
+            <separator height="1" />
+            <info label="'Reset to factory default name' removes the custom name. The phyphox:mini then uses the name it was delivered with again (letter and number, e.g. A19)."/>
             <button label="Reset to factory default name">
-                <input type="value">2</input>
-                <output>cmd_out</output>
-                <input type="value">255</input>
-                <output>char1_code</output>
-                <input type="value">255</input>
-                <output>char2_code</output>
-                <input type="value">255</input>
-                <output>char3_code</output>
-                <input type="value">255</input>
-                <output>char4_code</output>
-                <trigger>setName</trigger>
+                <trigger>resetName</trigger>
             </button>
         </view>
     </views>
