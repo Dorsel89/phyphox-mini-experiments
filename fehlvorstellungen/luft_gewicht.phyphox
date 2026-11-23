@@ -1,0 +1,528 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Hat Luft ein Gewicht?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Luftdruck unten und zwei Stockwerke höher, daraus Masse der Luftsäule und Luftdichte) und Nachtest zur Vorstellung „Luft ist nichts / wiegt nichts“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">p_raw</container>
+        <container size="0">Tb_raw</container>
+        <container size="0">tp_raw</container>
+        <container size="0">p</container>
+        <container size="0">Tb</container>
+        <container size="0">tp</container>
+        <container size="40">p_win</container>
+        <container size="40">Tb_win</container>
+        <container size="1">p_avg</container>
+        <container size="1">Tb_avg</container>
+        <container size="1">p_now</container>
+        <container size="1">tp_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1">p_first</container>
+        <container size="0">h</container>
+        <container size="1">p_unten</container>
+        <container size="1">p_oben</container>
+        <container size="1">p_unten2</container>
+        <container size="1">dp</container>
+        <container size="1">dp2</container>
+        <container size="1">dh</container>
+        <container size="1">m_luft</container>
+        <container size="1" init="6" clearGroup="_">h_stock</container>
+        <container size="1">rho</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_ball</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_ball_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_berg</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_berg_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_nichts</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_ball</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_ball_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_berg</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_berg_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_nichts</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_hochhaus</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="180" subscribeOnStart="true">
+            <!-- BMP581 an, Oversampling-Code 5 (5 = 32x), IIR-Code 2 -->
+            <config char="cddf1008-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010502</config>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="12">p_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="12">Tb_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="12">tp_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">p_raw</input>
+            <output append="true">p_win</output>
+        </append>
+        <append>
+            <input keep="true">Tb_raw</input>
+            <output append="true">Tb_win</output>
+        </append>
+        <append>
+            <input keep="false">p_raw</input>
+            <output append="true">p</output>
+        </append>
+        <append>
+            <input keep="false">Tb_raw</input>
+            <output append="true">Tb</output>
+        </append>
+        <append>
+            <input keep="false">tp_raw</input>
+            <output append="true">tp</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">p_win</input>
+            <output as="average">p_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">Tb_win</input>
+            <output as="average">Tb_avg</output>
+        </average>
+        <append>
+            <input keep="true">p</input>
+            <output>p_now</output>
+        </append>
+        <append>
+            <input keep="true">tp</input>
+            <output>tp_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">tp_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <first>
+            <input as="value" keep="true">p</input>
+            <output as="first">p_first</output>
+        </first>
+        <formula formula="([1]-[2_])*8.43">
+            <input keep="true">p_first</input>
+            <input keep="true">p</input>
+            <output>h</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p_oben</input>
+            <input keep="true">p_unten</input>
+            <output>dp</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p_unten2</input>
+            <input keep="true">p_oben</input>
+            <output>dp2</output>
+        </formula>
+        <formula formula="-[1]*8.43">
+            <input keep="true">dp</input>
+            <output>dh</output>
+        </formula>
+        <formula formula="abs([1])*100/9.81">
+            <input keep="true">dp</input>
+            <output>m_luft</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">m_luft</input>
+            <input keep="true">h_stock</input>
+            <output>rho</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_ball</input>
+            <input keep="true">pre_ball_sicher</input>
+            <input keep="true">pre_berg</input>
+            <input keep="true">pre_berg_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_ball</input>
+            <input keep="true">post_ball_sicher</input>
+            <input keep="true">post_berg</input>
+            <input keep="true">post_berg_sicher</input>
+            <input keep="true">post_hochhaus</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Hat Luft ein Gewicht? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden messen, dass der Luftdruck zwei Stockwerke höher kleiner ist, und deuten das als Gewicht der Luftschicht dazwischen. Der zweite Schritt rechnet den Druckunterschied in die Masse der Luft pro Quadratmeter und in die Luftdichte um (rund 1,2 kg/m³) – so wird „Luft hat Masse“ greifbar." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Luft ist nichts“; Luft hat kein oder sogar ein negatives Gewicht (Schecker u. a. 2018, S. 249)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Hydrostatischer Druck: Δp = ρ·g·Δh. Mit ρ = 1,2 kg/m³ sinkt der Druck um etwa 0,12 hPa pro Meter, also rund 8,4 m pro hPa. Zwei Stockwerke (6 m) ergeben etwa 0,7 hPa. Die Masse der Luftsäule pro Fläche ist m/A = Δp/g." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Oben etwa 0,6–0,8 hPa weniger, beim Zurückgehen gleich viel mehr. Luftdichte aus der Messung etwa 1,1–1,3 kg/m³ (abhängig von der eingegebenen Höhe)." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Wetterbedingte Druckänderungen (bis etwa 1 hPa pro Stunde) und Zugluft im Treppenhaus stören. Deshalb zügig messen; der Rückweg dient als Kontrolle. Den mini nicht in der warmen Hand umklammern (Temperaturdrift). Der Sensor läuft mit 32-fachem Oversampling und IIR-Filter, der angezeigte Druck ist zusätzlich über die letzten 40 Werte gemittelt." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Fußball wird prall aufgepumpt. Im Vergleich zum schlaffen Ball ist er …" italic="true" size="0.85" />
+            <info label="1 = leichter → Luft hat negatives Gewicht / zieht nach oben
+            2 = gleich schwer → Luft wiegt nichts
+            3 = schwerer → richtig" size="0.85" />
+            <info label="2. Auf einem hohen Berg ist der Luftdruck …" italic="true" size="0.85" />
+            <info label="1 = höher als im Tal → näher an der Sonne / mehr Wind
+            2 = gleich wie im Tal → Luftdruck überall gleich
+            3 = niedriger als im Tal → richtig" size="0.85" />
+            <info label="3. Luft wiegt nichts." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Warum sinkt der Luftdruck, wenn man im Hochhaus nach oben fährt?" italic="true" size="0.85" />
+            <info label="1 = Über einem liegt weniger Luft. → richtig
+            2 = Die Luft ist oben dünner, weil sie kälter ist. → Temperatur statt Gewicht
+            3 = Die Schwerkraft ist oben deutlich schwächer. → Schwerkraft-Erklärung" size="0.85" />
+            <info label="5 (nur Nachtest). Was zeigt die Rechnung „Masse der Luft pro Quadratmeter“ im Experiment?" italic="true" size="0.85" />
+            <info label="1 = Die Luft zwischen den Stockwerken hat eine Masse und drückt mit ihrem Gewicht nach unten. → richtig
+            2 = Nichts – der Druckunterschied kommt nur vom Treppensteigen. → Wegerklären
+            3 = Dass Luft nur in Bewegung etwas wiegt. → Luft wiegt nur als Wind" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = mehr → Druck nimmt nach oben zu" size="0.85" />
+            <info label="2 = etwa gleich viel → Luft wiegt nichts" size="0.85" />
+            <info label="3 = weniger → ERWARTET" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Hat Luft ein Gewicht? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Fußball wird prall aufgepumpt. Im Vergleich zum schlaffen Ball ist er …" bold="true" />
+            <dropdown default="0">
+                <output>pre_ball</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">leichter</map>
+                <map value="2">gleich schwer</map>
+                <map value="3">schwerer</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_ball_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Auf einem hohen Berg ist der Luftdruck …" bold="true" />
+            <dropdown default="0">
+                <output>pre_berg</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">höher als im Tal</map>
+                <map value="2">gleich wie im Tal</map>
+                <map value="3">niedriger als im Tal</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_berg_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Luft wiegt nichts." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_nichts</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_nichts">
+                <input>pre_nichts</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Hat Luft ein Gewicht? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst ein Treppenhaus mit mindestens zwei Stockwerken. Halte den mini ruhig in der Hand oder in der Hosentasche; das Smartphone nimmst du mit." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Was zeigt der Drucksensor zwei Stockwerke höher im Vergleich zu unten?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">mehr</map>
+                <map value="2">etwa gleich viel</map>
+                <map value="3">weniger</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Luftdruck" labelX="Zeit" unitX="s" labelY="Luftdruck" unitY="hPa" suppressScientificNotation="true" yPrecision="2" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">p</input>
+            </graph>
+            <graph visibility="vorhersage" label="Höhe aus dem Luftdruck (relativ zum Start)" labelX="Zeit" unitX="s" labelY="Höhe" unitY="m" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">h</input>
+            </graph>
+            <value visibility="vorhersage" label="Luftdruck (Mittel der letzten Werte)" precision="2" unit="hPa">
+                <input>p_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Unten" bold="true" />
+            <info visibility="vorhersage" label="Stell dich unten ins Treppenhaus und warte 30 Sekunden ruhig. Tippe dann:" />
+            <button visibility="vorhersage" label="Unten: Druck festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p_unten</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Oben" bold="true" />
+            <info visibility="vorhersage" label="Geh zügig zwei Stockwerke nach oben. Warte dort 30 Sekunden ruhig und tippe dann:" />
+            <button visibility="vorhersage" label="Oben: Druck festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p_oben</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Druckunterschied oben – unten" precision="2" unit="hPa">
+                <input>dp</input>
+            </value>
+            <value visibility="vorhersage" label="Höhenunterschied (aus dem Druck)" precision="1" unit="m">
+                <input>dh</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Wieder unten (Kontrolle)" bold="true" />
+            <info visibility="vorhersage" label="Geh wieder hinunter, warte 30 Sekunden und tippe. Der Druck sollte um denselben Betrag steigen." />
+            <button visibility="vorhersage" label="Wieder unten: Druck festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p_unten2</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Druckanstieg beim Hinuntergehen" precision="2" unit="hPa">
+                <input>dp2</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 5 – Wie schwer ist die Luft?" bold="true" />
+            <info visibility="vorhersage" label="Der Druckunterschied entsteht durch das Gewicht der Luft zwischen unten und oben. 1 hPa = 100 N pro Quadratmeter. Daraus folgt die Masse der Luft über jedem Quadratmeter Boden:" />
+            <value visibility="vorhersage" label="Masse der Luftschicht pro m²" precision="1" unit="kg">
+                <input>m_luft</input>
+            </value>
+            <info visibility="vorhersage" label="Gib die Höhe zwischen den beiden Messorten ein (zwei Stockwerke sind etwa 6 m), dann erhältst du, wie viel ein Kubikmeter Luft wiegt:" />
+            <edit visibility="vorhersage" label="Höhenunterschied" unit="m" default="6" signed="false">
+                <output>h_stock</output>
+            </edit>
+            <value visibility="vorhersage" label="Masse von 1 m³ Luft (Dichte)" precision="2" unit="kg/m³">
+                <input>rho</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Zum Vergleich: Ein Klassenzimmer enthält etwa 200 m³ Luft. Wie schwer ist diese Luft? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Hat Luft ein Gewicht? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Fußball wird prall aufgepumpt. Im Vergleich zum schlaffen Ball ist er …" bold="true" />
+            <dropdown default="0">
+                <output>post_ball</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">leichter</map>
+                <map value="2">gleich schwer</map>
+                <map value="3">schwerer</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_ball_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Auf einem hohen Berg ist der Luftdruck …" bold="true" />
+            <dropdown default="0">
+                <output>post_berg</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">höher als im Tal</map>
+                <map value="2">gleich wie im Tal</map>
+                <map value="3">niedriger als im Tal</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_berg_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Luft wiegt nichts." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_nichts</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_nichts">
+                <input>post_nichts</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Warum sinkt der Luftdruck, wenn man im Hochhaus nach oben fährt?" bold="true" />
+            <dropdown default="0">
+                <output>post_hochhaus</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Über einem liegt weniger Luft.</map>
+                <map value="2">Die Luft ist oben dünner, weil sie kälter ist.</map>
+                <map value="3">Die Schwerkraft ist oben deutlich schwächer.</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Was zeigt die Rechnung „Masse der Luft pro Quadratmeter“ im Experiment?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Die Luft zwischen den Stockwerken hat eine Masse und drückt mit ihrem Gewicht nach unten.</map>
+                <map value="2">Nichts – der Druckunterschied kommt nur vom Treppensteigen.</map>
+                <map value="3">Dass Luft nur in Bewegung etwas wiegt.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">tp</data>
+            <data name="Druck (hPa)">p</data>
+            <data name="Temperatur BMP (°C)">Tb</data>
+            <data name="Höhe relativ (m)">h</data>
+        </set>
+        <set name="Marker">
+            <data name="p unten (hPa)">p_unten</data>
+            <data name="p oben (hPa)">p_oben</data>
+            <data name="p wieder unten (hPa)">p_unten2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Druckunterschied oben-unten (hPa)">dp</data>
+            <data name="Druckanstieg zurück unten (hPa)">dp2</data>
+            <data name="Masse Luft pro m2 (kg)">m_luft</data>
+            <data name="Luftdichte (kg/m3)">rho</data>
+            <data name="Eingegebene Höhe (m)">h_stock</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_ball">pre_ball</data>
+            <data name="pre_ball_sicher">pre_ball_sicher</data>
+            <data name="pre_berg">pre_berg</data>
+            <data name="pre_berg_sicher">pre_berg_sicher</data>
+            <data name="pre_nichts">pre_nichts</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_ball">post_ball</data>
+            <data name="post_ball_sicher">post_ball_sicher</data>
+            <data name="post_berg">post_berg</data>
+            <data name="post_berg_sicher">post_berg_sicher</data>
+            <data name="post_nichts">post_nichts</data>
+            <data name="post_hochhaus">post_hochhaus</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_gewicht" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_ball" type="buffer" keep="true">pre_ball</send>
+            <send id="pre_ball_sicher" type="buffer" keep="true">pre_ball_sicher</send>
+            <send id="pre_berg" type="buffer" keep="true">pre_berg</send>
+            <send id="pre_berg_sicher" type="buffer" keep="true">pre_berg_sicher</send>
+            <send id="pre_nichts" type="buffer" keep="true">pre_nichts</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_gewicht" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="dp" type="buffer" keep="true">dp</send>
+            <send id="dp2" type="buffer" keep="true">dp2</send>
+            <send id="m_luft" type="buffer" keep="true">m_luft</send>
+            <send id="rho" type="buffer" keep="true">rho</send>
+            <send id="h_stock" type="buffer" keep="true">h_stock</send>
+            <send id="post_ball" type="buffer" keep="true">post_ball</send>
+            <send id="post_ball_sicher" type="buffer" keep="true">post_ball_sicher</send>
+            <send id="post_berg" type="buffer" keep="true">post_berg</send>
+            <send id="post_berg_sicher" type="buffer" keep="true">post_berg_sicher</send>
+            <send id="post_nichts" type="buffer" keep="true">post_nichts</send>
+            <send id="post_hochhaus" type="buffer" keep="true">post_hochhaus</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

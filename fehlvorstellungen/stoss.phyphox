@@ -1,0 +1,568 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Wer übt beim Stoß die größere Kraft aus?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit zwei phyphox:mini auf zwei Wagen unterschiedlicher Masse (Spitzen der Beschleunigung beim Stoß, Kräfte F = m·a) und Nachtest zur Vorstellung „Je schwerer, desto stärker“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">A_t_raw</container>
+        <container size="0">A_ax_raw</container>
+        <container size="0">A_ay_raw</container>
+        <container size="0">A_az_raw</container>
+        <container size="0">A_ta</container>
+        <container size="0">A_ax</container>
+        <container size="0">A_ay</container>
+        <container size="0">A_az</container>
+        <container size="0">A_a_new</container>
+        <container size="0">A_a_abs</container>
+        <container size="0">B_t_raw</container>
+        <container size="0">B_ax_raw</container>
+        <container size="0">B_ay_raw</container>
+        <container size="0">B_az_raw</container>
+        <container size="0">B_ta</container>
+        <container size="0">B_ax</container>
+        <container size="0">B_ay</container>
+        <container size="0">B_az</container>
+        <container size="0">B_a_new</container>
+        <container size="0">B_a_abs</container>
+        <container size="0">A_ah</container>
+        <container size="0">B_ah</container>
+        <container size="1">A_peak</container>
+        <container size="1">B_peak</container>
+        <container size="1" init="250" clearGroup="_">m_A</container>
+        <container size="1" init="500" clearGroup="_">m_B</container>
+        <container size="1">F_A</container>
+        <container size="1">F_B</container>
+        <container size="1">F_ratio</container>
+        <container size="1">a_ratio</container>
+        <container size="1">m_ratio</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_lkw</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_lkw_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_mond</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_mond_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_schwer</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_lkw</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_lkw_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_mond</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_mond_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schwer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_inliner</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="Wagen A (leicht)" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 416 Hz, Bereich-Code 1, Drehraten-Code 0, float, 15 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060100000F</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">A_t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">A_ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">A_ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">A_az_raw</output>
+        </bluetooth>
+        <bluetooth id="Wagen B (schwer)" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 416 Hz, Bereich-Code 1, Drehraten-Code 0, float, 15 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060100000F</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">B_t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">B_ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">B_ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">B_az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <formula formula="sqrt([1_]^2+[2_]^2)">
+            <input keep="true">A_ax_raw</input>
+            <input keep="true">A_ay_raw</input>
+            <output append="true">A_ah</output>
+        </formula>
+        <formula formula="sqrt([1_]^2+[2_]^2)">
+            <input keep="true">B_ax_raw</input>
+            <input keep="true">B_ay_raw</input>
+            <output append="true">B_ah</output>
+        </formula>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">A_ax_raw</input>
+            <input keep="true">A_ay_raw</input>
+            <input keep="true">A_az_raw</input>
+            <output>A_a_new</output>
+        </formula>
+        <append>
+            <input keep="true">A_a_new</input>
+            <output append="true">A_a_abs</output>
+        </append>
+        <append>
+            <input keep="false">A_t_raw</input>
+            <output append="true">A_ta</output>
+        </append>
+        <append>
+            <input keep="false">A_ax_raw</input>
+            <output append="true">A_ax</output>
+        </append>
+        <append>
+            <input keep="false">A_ay_raw</input>
+            <output append="true">A_ay</output>
+        </append>
+        <append>
+            <input keep="false">A_az_raw</input>
+            <output append="true">A_az</output>
+        </append>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">B_ax_raw</input>
+            <input keep="true">B_ay_raw</input>
+            <input keep="true">B_az_raw</input>
+            <output>B_a_new</output>
+        </formula>
+        <append>
+            <input keep="true">B_a_new</input>
+            <output append="true">B_a_abs</output>
+        </append>
+        <append>
+            <input keep="false">B_t_raw</input>
+            <output append="true">B_ta</output>
+        </append>
+        <append>
+            <input keep="false">B_ax_raw</input>
+            <output append="true">B_ax</output>
+        </append>
+        <append>
+            <input keep="false">B_ay_raw</input>
+            <output append="true">B_ay</output>
+        </append>
+        <append>
+            <input keep="false">B_az_raw</input>
+            <output append="true">B_az</output>
+        </append>
+        <max>
+            <input as="y" keep="true">A_ah</input>
+            <output as="max">A_peak</output>
+        </max>
+        <max>
+            <input as="y" keep="true">B_ah</input>
+            <output as="max">B_peak</output>
+        </max>
+        <formula formula="[1]/1000*[2]">
+            <input keep="true">m_A</input>
+            <input keep="true">A_peak</input>
+            <output>F_A</output>
+        </formula>
+        <formula formula="[1]/1000*[2]">
+            <input keep="true">m_B</input>
+            <input keep="true">B_peak</input>
+            <output>F_B</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">F_A</input>
+            <input keep="true">F_B</input>
+            <output>F_ratio</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">A_peak</input>
+            <input keep="true">B_peak</input>
+            <output>a_ratio</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">m_B</input>
+            <input keep="true">m_A</input>
+            <output>m_ratio</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_lkw</input>
+            <input keep="true">pre_lkw_sicher</input>
+            <input keep="true">pre_mond</input>
+            <input keep="true">pre_mond_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_lkw</input>
+            <input keep="true">post_lkw_sicher</input>
+            <input keep="true">post_mond</input>
+            <input keep="true">post_mond_sicher</input>
+            <input keep="true">post_inliner</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Wer übt beim Stoß die größere Kraft aus? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Zwei Wagen mit Massenverhältnis 1 : 2 stoßen zusammen. Die Spitzenbeschleunigungen verhalten sich umgekehrt wie die Massen, Masse mal Beschleunigung ist bei beiden gleich: actio = reactio. Die Ersatzvorstellung trennt Kraft (gleich) und Wirkung der Kraft (abhängig von der Masse)." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Je größer/schwerer, desto stärker“; beim Zusammenstoß übe der LKW die größere Kraft auf den PKW aus (Schecker u. a. 2018, S. 73; Handout). Verwandt: „Die stärkere Kraft gewinnt“ (S. 75). Aufgabe LKW/PKW nach dem Force and Motion Conceptual Evaluation." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Drittes Newtonsches Gesetz: F_AB = −F_BA zu jedem Zeitpunkt. Damit m_A·a_A = m_B·a_B, also a_A/a_B = m_B/m_A." />
+            <separator height="2" />
+            <info label="Auswertung" bold="true" />
+            <info label="Verglichen werden die Spitzenwerte der waagerechten Beschleunigung √(a_x² + a_y²) seit dem Knopf „Jetzt kommt der Stoß“. Die Zeitbasen der beiden Geräte sind nicht synchron, die Kurven können gegeneinander verschoben sein – das ist für die Spitzenwerte egal. Bei 416 Hz und einem weichen Puffer (Stoßdauer 20–50 ms) wird die Spitze gut erfasst." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Aufwendigstes Experiment: zwei Module, zwei Bluetooth-Verbindungen (in der Datei als „Wagen A (leicht)“ und „Wagen B (schwer)“). Die mini müssen flach liegen, sonst geht ein Teil der Schwerkraft in die waagerechte Komponente. Harter Stoß ohne Puffer erzeugt sehr kurze Spitzen, die unterabgetastet werden. Reibung und Schwingungen der Wagen verfälschen die Spitzen etwas; mehrfach wiederholen." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein LKW und ein PKW stoßen mit gleichem Tempo frontal zusammen. Die Kraft des LKW auf den PKW ist …" italic="true" size="0.85" />
+            <info label="1 = größer als die Kraft des PKW auf den LKW → je schwerer, desto stärker
+            2 = gleich groß wie die Kraft des PKW auf den LKW → richtig
+            3 = kleiner als die Kraft des PKW auf den LKW → unklare Vorstellung" size="0.85" />
+            <info label="2. Die Erde zieht den Mond an. Der Mond zieht die Erde …" italic="true" size="0.85" />
+            <info label="1 = schwächer an → je schwerer, desto stärker
+            2 = gleich stark an → richtig
+            3 = gar nicht an → nur der größere Körper wirkt" size="0.85" />
+            <info label="3. Der schwerere Körper übt beim Stoß die größere Kraft aus." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Erwachsener und ein Kind stehen auf Inlinern und stoßen sich mit den Händen voneinander ab. Wer übt die größere Kraft auf den anderen aus?" italic="true" size="0.85" />
+            <info label="1 = der Erwachsene → je schwerer, desto stärker
+            2 = beide gleich → richtig
+            3 = das Kind → unklare Vorstellung" size="0.85" />
+            <info label="5 (nur Nachtest). Warum wurde der leichtere Wagen beim Stoß stärker beschleunigt?" italic="true" size="0.85" />
+            <info label="1 = Er bekam die größere Kraft ab. → je schwerer, desto stärker
+            2 = Beide bekamen gleich viel Kraft, aber er hat weniger Masse. → richtig
+            3 = Der schwere Wagen hat seine Kraft beim Stoß verbraucht. → Kraft als Vorrat" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = auf den leichten Wagen A → je schwerer, desto stärker" size="0.85" />
+            <info label="2 = auf beide gleich → ERWARTET" size="0.85" />
+            <info label="3 = auf den schweren Wagen B → unklare Vorstellung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Wer übt beim Stoß die größere Kraft aus? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein LKW und ein PKW stoßen mit gleichem Tempo frontal zusammen. Die Kraft des LKW auf den PKW ist …" bold="true" />
+            <dropdown default="0">
+                <output>pre_lkw</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">größer als die Kraft des PKW auf den LKW</map>
+                <map value="2">gleich groß wie die Kraft des PKW auf den LKW</map>
+                <map value="3">kleiner als die Kraft des PKW auf den LKW</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_lkw_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Die Erde zieht den Mond an. Der Mond zieht die Erde …" bold="true" />
+            <dropdown default="0">
+                <output>pre_mond</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">schwächer an</map>
+                <map value="2">gleich stark an</map>
+                <map value="3">gar nicht an</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_mond_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Der schwerere Körper übt beim Stoß die größere Kraft aus." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_schwer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_schwer">
+                <input>pre_schwer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Wer übt beim Stoß die größere Kraft aus? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt." />
+            <info label="Du brauchst zwei phyphox:mini und zwei Wagen auf einer glatten Bahn. Wagen B soll etwa doppelt so schwer sein wie Wagen A (Zusatzgewicht). An einem Wagen ein weicher Puffer (Schaumstoff oder Feder). Klebe auf jeden Wagen einen mini flach auf. Beim Verbinden fragt phyphox nach zwei Geräten: zuerst der mini auf Wagen A, dann der auf Wagen B." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Wagen A ist leicht, Wagen B doppelt so schwer. Auf welchen Wagen wirkt beim Stoß die größere Kraft?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">auf den leichten Wagen A</map>
+                <map value="2">auf beide gleich</map>
+                <map value="3">auf den schweren Wagen B</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Waagerechte Beschleunigung" labelX="Zeit" unitX="s" labelY="a waagerecht" unitY="m/s²" partialUpdate="false">
+                <input axis="x" color="orange">A_ta</input>
+                <input axis="y">A_ah</input>
+                <input axis="x" color="blue">B_ta</input>
+                <input axis="y">B_ah</input>
+            </graph>
+            <info visibility="vorhersage" label="Orange: Wagen A (leicht) · Blau: Wagen B (schwer)" size="0.85" />
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Massen eingeben" bold="true" />
+            <edit visibility="vorhersage" label="Masse Wagen A mit mini" unit="g" default="250" signed="false">
+                <output>m_A</output>
+            </edit>
+            <edit visibility="vorhersage" label="Masse Wagen B mit mini" unit="g" default="500" signed="false">
+                <output>m_B</output>
+            </edit>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Stoß" bold="true" />
+            <info visibility="vorhersage" label="Wagen B steht still. Schiebe Wagen A an und lass ihn los. Tippe, sobald A frei rollt (vor dem Stoß):" />
+            <button visibility="vorhersage" label="Jetzt kommt der Stoß">
+                <input type="empty"></input>
+                <output>A_ta</output>
+                <input type="empty"></input>
+                <output>A_ax</output>
+                <input type="empty"></input>
+                <output>A_ay</output>
+                <input type="empty"></input>
+                <output>A_az</output>
+                <input type="empty"></input>
+                <output>A_a_abs</output>
+                <input type="empty"></input>
+                <output>A_ah</output>
+                <input type="empty"></input>
+                <output>B_ta</output>
+                <input type="empty"></input>
+                <output>B_ax</output>
+                <input type="empty"></input>
+                <output>B_ay</output>
+                <input type="empty"></input>
+                <output>B_az</output>
+                <input type="empty"></input>
+                <output>B_a_abs</output>
+                <input type="empty"></input>
+                <output>B_ah</output>
+            </button>
+            <value visibility="vorhersage" label="Größte Beschleunigung Wagen A" precision="2" unit="m/s²">
+                <input>A_peak</input>
+            </value>
+            <value visibility="vorhersage" label="Größte Beschleunigung Wagen B" precision="2" unit="m/s²">
+                <input>B_peak</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Kräfte vergleichen" bold="true" />
+            <info visibility="vorhersage" label="Kraft = Masse · Beschleunigung" />
+            <value visibility="vorhersage" label="Kraft auf Wagen A" precision="2" unit="N" size="1.3">
+                <input>F_A</input>
+            </value>
+            <value visibility="vorhersage" label="Kraft auf Wagen B" precision="2" unit="N" size="1.3">
+                <input>F_B</input>
+            </value>
+            <value visibility="vorhersage" label="Verhältnis der Kräfte A : B" precision="2">
+                <input>F_ratio</input>
+            </value>
+            <value visibility="vorhersage" label="Verhältnis der Beschleunigungen A : B" precision="2">
+                <input>a_ratio</input>
+            </value>
+            <value visibility="vorhersage" label="Verhältnis der Massen B : A" precision="2">
+                <input>m_ratio</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Wiederhole den Stoß ein paarmal, auch mit vertauschten Rollen. Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Wer übt beim Stoß die größere Kraft aus? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein LKW und ein PKW stoßen mit gleichem Tempo frontal zusammen. Die Kraft des LKW auf den PKW ist …" bold="true" />
+            <dropdown default="0">
+                <output>post_lkw</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">größer als die Kraft des PKW auf den LKW</map>
+                <map value="2">gleich groß wie die Kraft des PKW auf den LKW</map>
+                <map value="3">kleiner als die Kraft des PKW auf den LKW</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_lkw_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Die Erde zieht den Mond an. Der Mond zieht die Erde …" bold="true" />
+            <dropdown default="0">
+                <output>post_mond</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">schwächer an</map>
+                <map value="2">gleich stark an</map>
+                <map value="3">gar nicht an</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_mond_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Der schwerere Körper übt beim Stoß die größere Kraft aus." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_schwer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_schwer">
+                <input>post_schwer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Erwachsener und ein Kind stehen auf Inlinern und stoßen sich mit den Händen voneinander ab. Wer übt die größere Kraft auf den anderen aus?" bold="true" />
+            <dropdown default="0">
+                <output>post_inliner</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">der Erwachsene</map>
+                <map value="2">beide gleich</map>
+                <map value="3">das Kind</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum wurde der leichtere Wagen beim Stoß stärker beschleunigt?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Er bekam die größere Kraft ab.</map>
+                <map value="2">Beide bekamen gleich viel Kraft, aber er hat weniger Masse.</map>
+                <map value="3">Der schwere Wagen hat seine Kraft beim Stoß verbraucht.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Wagen A">
+            <data name="Zeit (s)">A_ta</data>
+            <data name="a waagerecht (m/s²)">A_ah</data>
+        </set>
+        <set name="Wagen B">
+            <data name="Zeit (s)">B_ta</data>
+            <data name="a waagerecht (m/s²)">B_ah</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Spitze a Wagen A (m/s2)">A_peak</data>
+            <data name="Spitze a Wagen B (m/s2)">B_peak</data>
+            <data name="Masse A (g)">m_A</data>
+            <data name="Masse B (g)">m_B</data>
+            <data name="Verhältnis F_A/F_B">F_ratio</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_lkw">pre_lkw</data>
+            <data name="pre_lkw_sicher">pre_lkw_sicher</data>
+            <data name="pre_mond">pre_mond</data>
+            <data name="pre_mond_sicher">pre_mond_sicher</data>
+            <data name="pre_schwer">pre_schwer</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_lkw">post_lkw</data>
+            <data name="post_lkw_sicher">post_lkw_sicher</data>
+            <data name="post_mond">post_mond</data>
+            <data name="post_mond_sicher">post_mond_sicher</data>
+            <data name="post_schwer">post_schwer</data>
+            <data name="post_inliner">post_inliner</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=stoss" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_lkw" type="buffer" keep="true">pre_lkw</send>
+            <send id="pre_lkw_sicher" type="buffer" keep="true">pre_lkw_sicher</send>
+            <send id="pre_mond" type="buffer" keep="true">pre_mond</send>
+            <send id="pre_mond_sicher" type="buffer" keep="true">pre_mond_sicher</send>
+            <send id="pre_schwer" type="buffer" keep="true">pre_schwer</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=stoss" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="A_peak" type="buffer" keep="true">A_peak</send>
+            <send id="B_peak" type="buffer" keep="true">B_peak</send>
+            <send id="m_A" type="buffer" keep="true">m_A</send>
+            <send id="m_B" type="buffer" keep="true">m_B</send>
+            <send id="F_ratio" type="buffer" keep="true">F_ratio</send>
+            <send id="post_lkw" type="buffer" keep="true">post_lkw</send>
+            <send id="post_lkw_sicher" type="buffer" keep="true">post_lkw_sicher</send>
+            <send id="post_mond" type="buffer" keep="true">post_mond</send>
+            <send id="post_mond_sicher" type="buffer" keep="true">post_mond_sicher</send>
+            <send id="post_schwer" type="buffer" keep="true">post_schwer</send>
+            <send id="post_inliner" type="buffer" keep="true">post_inliner</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

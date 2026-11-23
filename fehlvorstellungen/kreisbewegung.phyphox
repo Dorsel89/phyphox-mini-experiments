@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Wohin zeigt die Kraft im Kreis?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini auf einem Drehteller (radiale Beschleunigung und Drehrate, a über ω²) und Nachtest zu den Vorstellungen „Zentrifugalkraft nach außen“ und „Beschleunigung ist nur Tempoänderung“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="1" init="1" clearGroup="_">achse</container>
+        <container size="1">sx</container>
+        <container size="1">sy</container>
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="0">tg_raw</container>
+        <container size="0">gx_raw</container>
+        <container size="0">gy_raw</container>
+        <container size="0">gz_raw</container>
+        <container size="0">tg</container>
+        <container size="0">gz</container>
+        <container size="0">ain_new</container>
+        <container size="0">ain</container>
+        <container size="0">w2_new</container>
+        <container size="1">ain_chunk</container>
+        <container size="1">w2_chunk</container>
+        <container size="0">w2_sc</container>
+        <container size="0">ain_sc</container>
+        <container size="52">ain_win</container>
+        <container size="52">w_win</container>
+        <container size="1">ain_avg</container>
+        <container size="1">w_avg</container>
+        <container size="1">w2_avg</container>
+        <container size="1">r_mess</container>
+        <container size="1">w2_vis</container>
+        <container size="1">ain_hold</container>
+        <container size="1">w_hold</container>
+        <container size="1">r_hold</container>
+        <container size="1">gx_dump</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_kurve</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_kurve_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_karussell</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_karussell_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_aussen</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kurve</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kurve_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_karussell</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_karussell_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_aussen</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_satellit</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=3 (1 Beschl., 3 beides), 104 Hz, Bereich-Code 1, Drehraten-Code 12, float, 10 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0304010C000A</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+            <output char="cddf1000-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">tg_raw</output>
+            <output char="cddf1000-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">gx_raw</output>
+            <output char="cddf1000-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">gy_raw</output>
+            <output char="cddf1000-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">gz_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <formula formula="(1-abs(sign([1]-1)))-(1-abs(sign([1]-2)))">
+            <input keep="true">achse</input>
+            <output>sx</output>
+        </formula>
+        <formula formula="(1-abs(sign([1]-3)))-(1-abs(sign([1]-4)))">
+            <input keep="true">achse</input>
+            <output>sy</output>
+        </formula>
+        <formula formula="[1]*[3_]+[2]*[4_]">
+            <input keep="true">sx</input>
+            <input keep="true">sy</input>
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <output>ain_new</output>
+        </formula>
+        <append>
+            <input keep="true">ain_new</input>
+            <output append="true">ain</output>
+        </append>
+        <append>
+            <input keep="true">ain_new</input>
+            <output append="true">ain_win</output>
+        </append>
+        <formula formula="([1_]*3.14159265/180)^2">
+            <input keep="true">gz_raw</input>
+            <output>w2_new</output>
+        </formula>
+        <append>
+            <input keep="true">gz_raw</input>
+            <output append="true">w_win</output>
+        </append>
+        <average>
+            <input as="buffer" keep="false">ain_new</input>
+            <output as="average">ain_chunk</output>
+        </average>
+        <average>
+            <input as="buffer" keep="false">w2_new</input>
+            <output as="average">w2_chunk</output>
+        </average>
+        <match>
+            <input as="in" keep="true">w2_chunk</input>
+            <input as="in" keep="true">ain_chunk</input>
+            <output as="out" append="true">w2_sc</output>
+            <output as="out" append="true">ain_sc</output>
+        </match>
+        <append>
+            <input keep="false">tg_raw</input>
+            <output append="true">tg</output>
+        </append>
+        <append>
+            <input keep="false">gz_raw</input>
+            <output append="true">gz</output>
+        </append>
+        <append>
+            <input keep="false">gx_raw</input>
+            <output>gx_dump</output>
+        </append>
+        <append>
+            <input keep="false">gy_raw</input>
+            <output>gx_dump</output>
+        </append>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">ain_win</input>
+            <output as="average">ain_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">w_win</input>
+            <output as="average">w_avg</output>
+        </average>
+        <formula formula="([1]*3.14159265/180)^2">
+            <input keep="true">w_avg</input>
+            <output>w2_avg</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">ain_avg</input>
+            <input keep="true">w2_avg</input>
+            <output>r_mess</output>
+        </formula>
+        <formula formula="[1]-1">
+            <input keep="true">w2_avg</input>
+            <output>w2_vis</output>
+        </formula>
+        <formula formula="[1]/([2]*3.14159265/180)^2">
+            <input keep="true">ain_hold</input>
+            <input keep="true">w_hold</input>
+            <output>r_hold</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_kurve</input>
+            <input keep="true">pre_kurve_sicher</input>
+            <input keep="true">pre_karussell</input>
+            <input keep="true">pre_karussell_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_kurve</input>
+            <input keep="true">post_kurve_sicher</input>
+            <input keep="true">post_karussell</input>
+            <input keep="true">post_karussell_sicher</input>
+            <input keep="true">post_satellit</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Wohin zeigt die Kraft im Kreis? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Auf dem gleichmäßig drehenden Teller zeigt die gemessene Beschleunigung zur Drehachse, obwohl sich das Tempo nicht ändert. Sie wächst mit dem Quadrat der Drehrate (a = ω²·r). Damit werden zwei Vorstellungen angesprochen: die Zentrifugalkraft als reale, nach außen wirkende Kraft und „Beschleunigung ist nur Tempoänderung“." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Bei Kreisbewegungen wirkt die Zentrifugalkraft“ nach außen – eine der hartnäckigsten Vorstellungen (Schecker u. a. 2018, S. 78–79; Handout). „Beschleunigung ist Tempoänderung“, eine Richtungsänderung gilt nicht als Beschleunigung (S. 66)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Der Sensor misst die Kraft der Unterlage (Haftreibung, Wand der Salatschleuder) pro Masse. Diese zeigt zur Drehachse und hält den mini auf der Kreisbahn: a = ω²·r. Bei r = 10 cm und 300 °/s (5,2 rad/s) sind das etwa 2,7 m/s². Das „Gefühl, nach außen gedrückt zu werden“, ist die Trägheit im mitrotierenden Bezugssystem." />
+            <separator height="2" />
+            <info label="Auswertung" bold="true" />
+            <info label="Die Achsen-Auswahl legt fest, welche Komponente (x oder y, mit Vorzeichen) als „nach innen“ gilt. Für das Diagramm a über ω² werden die Werte je Datenpaket gemittelt. Der Radius aus der Messung wird nur angezeigt, wenn ω² über 1/s² liegt." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Achsenrichtung und Vorzeichen hängen von der Montage ab – vorher auf einem Teller testen und die Achsen auf dem Gehäuse markieren. Sensor liegt nicht im Mittelpunkt des Gehäuses; den Radius zur Sensormitte messen. Drehebene waagerecht halten, sonst überlagert die Schwerkraft das Signal (Fahrradfelge ungeeignet). Beschleunigungs- und Drehratenpakete kommen getrennt an; die Zuordnung je Paket ist eine Näherung (prüfen)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Auto fährt mit gleichbleibendem Tempo durch eine Linkskurve. Die Gesamtkraft auf das Auto zeigt …" italic="true" size="0.85" />
+            <info label="1 = nach außen (rechts) → Zentrifugalkraft
+            2 = nach innen (links) → richtig
+            3 = nach vorn → Kraft in Bewegungsrichtung
+            4 = es wirkt keine, das Tempo ist ja gleich → Beschleunigung = Tempoänderung" size="0.85" />
+            <info label="2. Ein Karussell dreht sich gleichmäßig. Wird ein Kind auf dem Karussell beschleunigt?" italic="true" size="0.85" />
+            <info label="1 = nein, das Tempo bleibt gleich → Beschleunigung = Tempoänderung
+            2 = ja, zur Mitte hin → richtig
+            3 = ja, nach außen → Zentrifugalkraft" size="0.85" />
+            <info label="3. In der Kurve drückt mich eine Kraft nach außen." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung (Zentrifugalkraft als reale Kraft)" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Satellit kreist um die Erde. Welche Kräfte wirken auf ihn?" italic="true" size="0.85" />
+            <info label="1 = die Schwerkraft und die Fliehkraft, die sich aufheben → Zentrifugalkraft
+            2 = nur die Schwerkraft, zur Erde hin → richtig
+            3 = keine, er ist schwerelos → Schwerelosigkeit = keine Kraft" size="0.85" />
+            <info label="5 (nur Nachtest). Die gemessene Beschleunigung zeigte zur Drehachse, weil …" italic="true" size="0.85" />
+            <info label="1 = die Unterlage den mini ständig zur Mitte hin von der geraden Bahn ablenkt → richtig
+            2 = die Fliehkraft nach innen wirkt → Begriffsverwirrung
+            3 = der Sensor nur die Drehung misst, nicht die Kraft → Wegerklären" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = nach außen → Zentrifugalkraft" size="0.85" />
+            <info label="2 = nach innen, zur Drehachse → ERWARTET" size="0.85" />
+            <info label="3 = in Bewegungsrichtung → Kraft in Bewegungsrichtung" size="0.85" />
+            <info label="4 = es gibt keine, das Tempo ist ja gleich → Beschleunigung = Tempoänderung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Wohin zeigt die Kraft im Kreis? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Auto fährt mit gleichbleibendem Tempo durch eine Linkskurve. Die Gesamtkraft auf das Auto zeigt …" bold="true" />
+            <dropdown default="0">
+                <output>pre_kurve</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nach außen (rechts)</map>
+                <map value="2">nach innen (links)</map>
+                <map value="3">nach vorn</map>
+                <map value="4">es wirkt keine, das Tempo ist ja gleich</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_kurve_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Karussell dreht sich gleichmäßig. Wird ein Kind auf dem Karussell beschleunigt?" bold="true" />
+            <dropdown default="0">
+                <output>pre_karussell</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nein, das Tempo bleibt gleich</map>
+                <map value="2">ja, zur Mitte hin</map>
+                <map value="3">ja, nach außen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_karussell_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. In der Kurve drückt mich eine Kraft nach außen." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_aussen</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_aussen">
+                <input>pre_aussen</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Wohin zeigt die Kraft im Kreis? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt." />
+            <info label="Du brauchst einen waagerechten Drehteller (Plattenspieler, Drehhocker mit Brett, Salatschleuder) und Klebeband, um den mini zu befestigen." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Lege den mini flach auf den Drehteller (oder in die Salatschleuder), etwa 10 cm von der Drehachse entfernt. Welche Achse des mini zeigt zur Drehachse (nach innen)? Die Achsen sind auf dem Gehäuse markiert." />
+            <dropdown default="1">
+                <output>achse</output>
+                <map value="1">+x zeigt nach innen</map>
+                <map value="2">−x zeigt nach innen</map>
+                <map value="3">+y zeigt nach innen</map>
+                <map value="4">−y zeigt nach innen</map>
+            </dropdown>
+            <info label="In welche Richtung zeigt die gemessene Beschleunigung, wenn sich der Teller gleichmäßig dreht?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nach außen</map>
+                <map value="2">nach innen, zur Drehachse</map>
+                <map value="3">in Bewegungsrichtung</map>
+                <map value="4">es gibt keine, das Tempo ist ja gleich</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Beschleunigung zur Drehachse hin" labelX="Zeit" unitX="s" labelY="a nach innen" unitY="m/s²" partialUpdate="true">
+                <input axis="x">ta</input>
+                <input axis="y">ain</input>
+            </graph>
+            <value visibility="vorhersage" label="Gemessene Beschleunigung" precision="2" unit="m/s²" size="1.5">
+                <input>ain_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Richtung" precision="2">
+                <input>ain_avg</input>
+                <map min="0.3">nach innen, zur Drehachse</map>
+                <map max="-0.3">nach außen</map>
+                <map>etwa 0</map>
+            </value>
+            <value visibility="vorhersage" label="Drehrate" precision="0" unit="°/s">
+                <input>w_avg</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Gleichmäßig drehen" bold="true" />
+            <info visibility="vorhersage" label="Drehe den Teller gleichmäßig, erst langsam (etwa eine Umdrehung in 2 Sekunden), dann schneller. Halte jede Geschwindigkeit einige Sekunden. Tippe bei gleichmäßiger Drehung:" />
+            <button visibility="vorhersage" label="Werte bei gleichmäßiger Drehung festhalten">
+                <input type="buffer">ain_avg</input>
+                <output>ain_hold</output>
+                <input type="buffer">w_avg</input>
+                <output>w_hold</output>
+            </button>
+            <value visibility="vorhersage" label="Festgehalten: Beschleunigung nach innen" precision="2" unit="m/s²">
+                <input>ain_hold</input>
+            </value>
+            <value visibility="vorhersage" label="Festgehalten: Drehrate" precision="0" unit="°/s">
+                <input>w_hold</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Je schneller, desto mehr?" bold="true" />
+            <graph visibility="vorhersage" label="Beschleunigung über ω² (Drehrate zum Quadrat)" labelX="ω²" unitX="1/s²" labelY="a nach innen" unitY="m/s²" style="dots" partialUpdate="false" scaleMinX="fixed" minX="0">
+                <input axis="x">w2_sc</input>
+                <input axis="y">ain_sc</input>
+            </graph>
+            <info visibility="vorhersage" label="Liegen die Punkte auf einer Geraden durch den Ursprung, gilt a = ω²·r. Die Steigung ist der Abstand von der Drehachse:" />
+            <value label="Radius aus der Messung (aktuell)" precision="1" unit="cm" factor="100" visibility="w2_vis">
+                <input>r_mess</input>
+            </value>
+            <value visibility="vorhersage" label="Radius aus den festgehaltenen Werten" precision="1" unit="cm" factor="100">
+                <input>r_hold</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Miss den Abstand des mini von der Drehachse mit dem Lineal und vergleiche. Wer übt die Kraft zur Mitte hin aus? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Wohin zeigt die Kraft im Kreis? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Auto fährt mit gleichbleibendem Tempo durch eine Linkskurve. Die Gesamtkraft auf das Auto zeigt …" bold="true" />
+            <dropdown default="0">
+                <output>post_kurve</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nach außen (rechts)</map>
+                <map value="2">nach innen (links)</map>
+                <map value="3">nach vorn</map>
+                <map value="4">es wirkt keine, das Tempo ist ja gleich</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_kurve_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Karussell dreht sich gleichmäßig. Wird ein Kind auf dem Karussell beschleunigt?" bold="true" />
+            <dropdown default="0">
+                <output>post_karussell</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nein, das Tempo bleibt gleich</map>
+                <map value="2">ja, zur Mitte hin</map>
+                <map value="3">ja, nach außen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_karussell_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. In der Kurve drückt mich eine Kraft nach außen." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_aussen</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_aussen">
+                <input>post_aussen</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Satellit kreist um die Erde. Welche Kräfte wirken auf ihn?" bold="true" />
+            <dropdown default="0">
+                <output>post_satellit</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die Schwerkraft und die Fliehkraft, die sich aufheben</map>
+                <map value="2">nur die Schwerkraft, zur Erde hin</map>
+                <map value="3">keine, er ist schwerelos</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Die gemessene Beschleunigung zeigte zur Drehachse, weil …" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die Unterlage den mini ständig zur Mitte hin von der geraden Bahn ablenkt</map>
+                <map value="2">die Fliehkraft nach innen wirkt</map>
+                <map value="3">der Sensor nur die Drehung misst, nicht die Kraft</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung Beschleunigung">
+            <data name="Zeit (s)">ta</data>
+            <data name="a_x (m/s²)">ax</data>
+            <data name="a_y (m/s²)">ay</data>
+            <data name="a_z (m/s²)">az</data>
+            <data name="a nach innen (m/s²)">ain</data>
+        </set>
+        <set name="Messung Drehrate">
+            <data name="Zeit (s)">tg</data>
+            <data name="ω_z (°/s)">gz</data>
+        </set>
+        <set name="a über ω²">
+            <data name="ω² (1/s²)">w2_sc</data>
+            <data name="a nach innen (m/s²)">ain_sc</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Gewählte Achse">achse</data>
+            <data name="a nach innen (m/s2)">ain_hold</data>
+            <data name="Drehrate (Grad/s)">w_hold</data>
+            <data name="Radius aus Messung (m)">r_hold</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_kurve">pre_kurve</data>
+            <data name="pre_kurve_sicher">pre_kurve_sicher</data>
+            <data name="pre_karussell">pre_karussell</data>
+            <data name="pre_karussell_sicher">pre_karussell_sicher</data>
+            <data name="pre_aussen">pre_aussen</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_kurve">post_kurve</data>
+            <data name="post_kurve_sicher">post_kurve_sicher</data>
+            <data name="post_karussell">post_karussell</data>
+            <data name="post_karussell_sicher">post_karussell_sicher</data>
+            <data name="post_aussen">post_aussen</data>
+            <data name="post_satellit">post_satellit</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=kreisbewegung" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_kurve" type="buffer" keep="true">pre_kurve</send>
+            <send id="pre_kurve_sicher" type="buffer" keep="true">pre_kurve_sicher</send>
+            <send id="pre_karussell" type="buffer" keep="true">pre_karussell</send>
+            <send id="pre_karussell_sicher" type="buffer" keep="true">pre_karussell_sicher</send>
+            <send id="pre_aussen" type="buffer" keep="true">pre_aussen</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=kreisbewegung" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="achse" type="buffer" keep="true">achse</send>
+            <send id="ain_hold" type="buffer" keep="true">ain_hold</send>
+            <send id="w_hold" type="buffer" keep="true">w_hold</send>
+            <send id="r_hold" type="buffer" keep="true">r_hold</send>
+            <send id="post_kurve" type="buffer" keep="true">post_kurve</send>
+            <send id="post_kurve_sicher" type="buffer" keep="true">post_kurve_sicher</send>
+            <send id="post_karussell" type="buffer" keep="true">post_karussell</send>
+            <send id="post_karussell_sicher" type="buffer" keep="true">post_karussell_sicher</send>
+            <send id="post_aussen" type="buffer" keep="true">post_aussen</send>
+            <send id="post_satellit" type="buffer" keep="true">post_satellit</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

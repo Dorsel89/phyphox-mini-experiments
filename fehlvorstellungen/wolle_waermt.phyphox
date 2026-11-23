@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Wolle wärmt?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Temperatur in einer Wollsocke) und Nachtest zur Vorstellung „Wolle macht warm“. Die Antworten werden an den Umfrage-Server übertragen.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t</container>
+        <container size="0">temp</container>
+        <container size="0">hum</container>
+        <container size="1">t_now</container>
+        <container size="1">T_now</container>
+        <container size="1">H_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1">t0</container>
+        <container size="1">T0</container>
+        <container size="1">T1</container>
+        <container size="1">T2</container>
+        <container size="1">dT_socke</container>
+        <container size="1">dT_hand</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_schal</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_schal_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_eis</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_eis_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_jacke</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_decke</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schal</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schal_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_eis</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_eis_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_jacke</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_decke</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schneemann</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" subscribeOnStart="true">
+            <!-- HDC1080 an, Messintervall 10 x 100 ms -->
+            <config char="cddf1006-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010A</config>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0">temp</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">hum</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">t</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">temp</input>
+            <output>T_now</output>
+        </append>
+        <append>
+            <input keep="true">hum</input>
+            <output>H_now</output>
+        </append>
+        <append>
+            <input keep="true">t</input>
+            <output>t_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">T1</input>
+            <input keep="true">T0</input>
+            <output>dT_socke</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">T2</input>
+            <input keep="true">T1</input>
+            <output>dT_hand</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_schal</input>
+            <input keep="true">pre_schal_sicher</input>
+            <input keep="true">pre_eis</input>
+            <input keep="true">pre_eis_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_schal</input>
+            <input keep="true">post_schal_sicher</input>
+            <input keep="true">post_eis</input>
+            <input keep="true">post_eis_sicher</input>
+            <input keep="true">post_schneemann</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Wolle wärmt? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden prüfen, ob Wolle selbst Wärme erzeugt. Der mini liegt 5 Minuten in einer Socke mit Zimmertemperatur – die Temperatur ändert sich kaum. Erst mit der Hand in der Socke steigt sie deutlich. Ersatzvorstellung: Die Wärme kommt vom Körper, die Wolle bremst nur den Wärmestrom (Isolation)." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Wolle macht warm“ (Schecker u. a. 2018, S. 151; Handout). Materialien wird die Eigenschaft „warm“ zugeschrieben; jüngere Lernende meinen, eine Puppe unter der Bettdecke werde gewärmt." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Wolle schließt viel ruhende Luft ein und leitet Wärme schlecht. Sie verlangsamt den Wärmestrom in beide Richtungen: Ein warmer Körper bleibt länger warm, ein kalter länger kalt. Ohne Wärmequelle im Inneren stellt sich Zimmertemperatur ein." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Nur Socke: Änderung unter etwa 0,5 K. Mit Hand: mehrere Kelvin Anstieg in 2 Minuten." />
+            <separator height="2" />
+            <info label="Erweiterung (noch nicht umgesetzt)" bold="true" />
+            <info label="Kalt-Vergleich: mini abkühlen, einmal offen und einmal in der Socke aufwärmen lassen – in der Socke bleibt er länger kalt. Trennt die Vorstellungen am besten. Dazu passt die Cola-Dose aus dem Kühlschrank in der Wolldecke (Buch S. 151)." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Eigenerwärmung der Elektronik in der Isolation könnte einige Zehntel Kelvin Anstieg erzeugen und die Fehlvorstellung scheinbar bestätigen – vor dem Einsatz testen. Die Socke darf nicht gerade getragen worden sein oder von der Heizung kommen. Beim Einwickeln den mini nur kurz anfassen." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Thermometer liegt seit einer Stunde in einem Zimmer mit 21 °C. Du wickelst es in einen dicken Wollschal. Was zeigt es nach 15 Minuten an?" italic="true" size="0.85" />
+            <info label="1 = deutlich mehr als 21 °C → Wolle macht warm
+            2 = etwa 21 °C → richtig
+            3 = weniger als 21 °C → Wolle kühlt / unklare Vorstellung" size="0.85" />
+            <info label="2. Du willst ein Eis am Stiel ohne Kühlschrank möglichst lange kalt halten. Was ist am besten?" italic="true" size="0.85" />
+            <info label="1 = offen auf den Tisch legen → Wolle macht warm (also schlecht fürs Eis)
+            2 = in einen Wollpullover wickeln → richtig
+            3 = das macht keinen Unterschied → Isolation nicht verstanden" size="0.85" />
+            <info label="3. Eine Winterjacke erzeugt Wärme." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4. Unter einer dicken Decke wird es auch dann wärmer, wenn niemand darunter liegt." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="5 (nur Nachtest). Zwei gleiche Schneemänner stehen in der Sonne. Einer bekommt einen Wintermantel angezogen. Welcher schmilzt schneller?" italic="true" size="0.85" />
+            <info label="1 = der mit Mantel → Wolle/Mantel macht warm
+            2 = der ohne Mantel → richtig
+            3 = beide gleich schnell → Isolation nicht verstanden" size="0.85" />
+            <info label="6 (nur Nachtest). Warum ist die Temperatur gestiegen, als deine Hand mit in der Socke war?" italic="true" size="0.85" />
+            <info label="1 = Wolle erzeugt Wärme, sobald sie etwas berührt → Wolle macht warm
+            2 = Die Hand gibt Wärme ab, die Wolle hält sie zurück → richtig
+            3 = Durch die Reibung der Hand an der Wolle → Ausweicherklärung" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = sie steigt deutlich → Wolle macht warm" size="0.85" />
+            <info label="2 = sie bleibt etwa gleich → ERWARTET" size="0.85" />
+            <info label="3 = sie sinkt → unklare Vorstellung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Wolle wärmt? – Vortest" bold="true" size="1.2" />
+            <info label="Lege den phyphox:mini auf den Tisch und fasse ihn nicht mehr an. Tippe dann oben rechts auf ▶ und beantworte die Fragen. Die Messung läuft währenddessen schon mit." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Thermometer liegt seit einer Stunde in einem Zimmer mit 21 °C. Du wickelst es in einen dicken Wollschal. Was zeigt es nach 15 Minuten an?" bold="true" />
+            <dropdown default="0">
+                <output>pre_schal</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">deutlich mehr als 21 °C</map>
+                <map value="2">etwa 21 °C</map>
+                <map value="3">weniger als 21 °C</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_schal_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Du willst ein Eis am Stiel ohne Kühlschrank möglichst lange kalt halten. Was ist am besten?" bold="true" />
+            <dropdown default="0">
+                <output>pre_eis</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">offen auf den Tisch legen</map>
+                <map value="2">in einen Wollpullover wickeln</map>
+                <map value="3">das macht keinen Unterschied</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_eis_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Eine Winterjacke erzeugt Wärme." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_jacke</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_jacke">
+                <input>pre_jacke</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Unter einer dicken Decke wird es auch dann wärmer, wenn niemand darunter liegt." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_decke</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_decke">
+                <input>pre_decke</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Wolle wärmt? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst eine Wollsocke, einen Handschuh oder einen Schal. Das Kleidungsstück muss Zimmertemperatur haben (nicht gerade getragen, nicht von der Heizung)." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Der mini kommt gleich für 5 Minuten in die Socke. Was passiert mit der Temperatur?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sie steigt deutlich</map>
+                <map value="2">sie bleibt etwa gleich</map>
+                <map value="3">sie sinkt</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Temperatur am phyphox:mini" labelX="Zeit" unitX="s" labelY="Temperatur" unitY="°C" scaleMinY="fixed" scaleMaxY="fixed" minY="15" maxY="40" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">temp</input>
+            </graph>
+            <value visibility="vorhersage" label="Temperatur jetzt" precision="2" unit="°C">
+                <input>T_now</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Nur die Socke" bold="true" />
+            <info visibility="vorhersage" label="Stecke den mini tief in die Socke. Fasse ihn dabei möglichst nur kurz an und lege die Socke auf den Tisch. Tippe dann sofort:" />
+            <button visibility="vorhersage" label="Der mini ist jetzt in der Socke">
+                <input type="buffer">T_now</input>
+                <output>T0</output>
+                <input type="buffer">t_now</input>
+                <output>t0</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <info visibility="vorhersage" label="Warte, bis 300 s vergangen sind, und tippe dann:" />
+            <button visibility="vorhersage" label="5 Minuten sind um">
+                <input type="buffer">T_now</input>
+                <output>T1</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Änderung nur in der Socke" precision="2" unit="K">
+                <input>dT_socke</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Socke mit Hand" bold="true" />
+            <info visibility="vorhersage" label="Stecke jetzt deine Hand mit in die Socke und umschließe den mini locker. Warte 2 Minuten (120 s) und tippe dann:" />
+            <button visibility="vorhersage" label="2 Minuten mit Hand sind um">
+                <input type="buffer">T_now</input>
+                <output>T2</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Änderung mit Hand in der Socke" precision="2" unit="K">
+                <input>dT_hand</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Vergleiche die beiden Änderungen mit deiner Vorhersage. Woher kommt die Wärme? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Wolle wärmt? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Thermometer liegt seit einer Stunde in einem Zimmer mit 21 °C. Du wickelst es in einen dicken Wollschal. Was zeigt es nach 15 Minuten an?" bold="true" />
+            <dropdown default="0">
+                <output>post_schal</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">deutlich mehr als 21 °C</map>
+                <map value="2">etwa 21 °C</map>
+                <map value="3">weniger als 21 °C</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_schal_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Du willst ein Eis am Stiel ohne Kühlschrank möglichst lange kalt halten. Was ist am besten?" bold="true" />
+            <dropdown default="0">
+                <output>post_eis</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">offen auf den Tisch legen</map>
+                <map value="2">in einen Wollpullover wickeln</map>
+                <map value="3">das macht keinen Unterschied</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_eis_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Eine Winterjacke erzeugt Wärme." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_jacke</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_jacke">
+                <input>post_jacke</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Unter einer dicken Decke wird es auch dann wärmer, wenn niemand darunter liegt." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_decke</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_decke">
+                <input>post_decke</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="5. Zwei gleiche Schneemänner stehen in der Sonne. Einer bekommt einen Wintermantel angezogen. Welcher schmilzt schneller?" bold="true" />
+            <dropdown default="0">
+                <output>post_schneemann</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">der mit Mantel</map>
+                <map value="2">der ohne Mantel</map>
+                <map value="3">beide gleich schnell</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="6. Warum ist die Temperatur gestiegen, als deine Hand mit in der Socke war?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Wolle erzeugt Wärme, sobald sie etwas berührt</map>
+                <map value="2">Die Hand gibt Wärme ab, die Wolle hält sie zurück</map>
+                <map value="3">Durch die Reibung der Hand an der Wolle</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">t</data>
+            <data name="Temperatur (°C)">temp</data>
+            <data name="Relative Feuchte (%)">hum</data>
+        </set>
+        <set name="Marker">
+            <data name="Zeitpunkt Einwickeln (s)">t0</data>
+            <data name="T beim Einwickeln (°C)">T0</data>
+            <data name="T nach 5 min Socke (°C)">T1</data>
+            <data name="T nach 2 min Hand (°C)">T2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="T beim Einwickeln (°C)">T0</data>
+            <data name="Änderung in der Socke (K)">dT_socke</data>
+            <data name="Änderung mit Hand (K)">dT_hand</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_schal">pre_schal</data>
+            <data name="pre_schal_sicher">pre_schal_sicher</data>
+            <data name="pre_eis">pre_eis</data>
+            <data name="pre_eis_sicher">pre_eis_sicher</data>
+            <data name="pre_jacke">pre_jacke</data>
+            <data name="pre_decke">pre_decke</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_schal">post_schal</data>
+            <data name="post_schal_sicher">post_schal_sicher</data>
+            <data name="post_eis">post_eis</data>
+            <data name="post_eis_sicher">post_eis_sicher</data>
+            <data name="post_jacke">post_jacke</data>
+            <data name="post_decke">post_decke</data>
+            <data name="post_schneemann">post_schneemann</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=wolle_waermt" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_schal" type="buffer" keep="true">pre_schal</send>
+            <send id="pre_schal_sicher" type="buffer" keep="true">pre_schal_sicher</send>
+            <send id="pre_eis" type="buffer" keep="true">pre_eis</send>
+            <send id="pre_eis_sicher" type="buffer" keep="true">pre_eis_sicher</send>
+            <send id="pre_jacke" type="buffer" keep="true">pre_jacke</send>
+            <send id="pre_decke" type="buffer" keep="true">pre_decke</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=wolle_waermt" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="T0" type="buffer" keep="true">T0</send>
+            <send id="dT_socke" type="buffer" keep="true">dT_socke</send>
+            <send id="dT_hand" type="buffer" keep="true">dT_hand</send>
+            <send id="post_schal" type="buffer" keep="true">post_schal</send>
+            <send id="post_schal_sicher" type="buffer" keep="true">post_schal_sicher</send>
+            <send id="post_eis" type="buffer" keep="true">post_eis</send>
+            <send id="post_eis_sicher" type="buffer" keep="true">post_eis_sicher</send>
+            <send id="post_jacke" type="buffer" keep="true">post_jacke</send>
+            <send id="post_decke" type="buffer" keep="true">post_decke</send>
+            <send id="post_schneemann" type="buffer" keep="true">post_schneemann</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

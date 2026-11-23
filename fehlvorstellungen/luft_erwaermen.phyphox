@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Erwärmte Luft: steigt sie nur auf?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Druck und Temperatur in einem verschlossenen Glas im warmen und kalten Wasserbad) und Nachtest zur Vorstellung „Warme Luft steigt nur auf“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">p_raw</container>
+        <container size="0">Tb_raw</container>
+        <container size="0">tp_raw</container>
+        <container size="0">p</container>
+        <container size="0">Tb</container>
+        <container size="0">tp</container>
+        <container size="40">p_win</container>
+        <container size="40">Tb_win</container>
+        <container size="1">p_avg</container>
+        <container size="1">Tb_avg</container>
+        <container size="1">p_now</container>
+        <container size="1">tp_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1">p0</container>
+        <container size="1">T0</container>
+        <container size="1">p1</container>
+        <container size="1">T1</container>
+        <container size="1">p2</container>
+        <container size="1">T2</container>
+        <container size="1">dp_warm</container>
+        <container size="1">dp_kalt</container>
+        <container size="1">p1_erw</container>
+        <container size="1">dp_erw</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_flasche</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_flasche_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_ballon</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_ballon_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_platz</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_flasche</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_flasche_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_ballon</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_ballon_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_platz</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_reifen</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="180" subscribeOnStart="true">
+            <!-- BMP581 an, Oversampling-Code 5 (5 = 32x), IIR-Code 1 -->
+            <config char="cddf1008-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010501</config>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="12">p_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="12">Tb_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="12">tp_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">p_raw</input>
+            <output append="true">p_win</output>
+        </append>
+        <append>
+            <input keep="true">Tb_raw</input>
+            <output append="true">Tb_win</output>
+        </append>
+        <append>
+            <input keep="false">p_raw</input>
+            <output append="true">p</output>
+        </append>
+        <append>
+            <input keep="false">Tb_raw</input>
+            <output append="true">Tb</output>
+        </append>
+        <append>
+            <input keep="false">tp_raw</input>
+            <output append="true">tp</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">p_win</input>
+            <output as="average">p_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">Tb_win</input>
+            <output as="average">Tb_avg</output>
+        </average>
+        <append>
+            <input keep="true">p</input>
+            <output>p_now</output>
+        </append>
+        <append>
+            <input keep="true">tp</input>
+            <output>tp_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">tp_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p1</input>
+            <input keep="true">p0</input>
+            <output>dp_warm</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p2</input>
+            <input keep="true">p0</input>
+            <output>dp_kalt</output>
+        </formula>
+        <formula formula="[1]*(273.15+[2])/(273.15+[3])">
+            <input keep="true">p0</input>
+            <input keep="true">T1</input>
+            <input keep="true">T0</input>
+            <output>p1_erw</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p1_erw</input>
+            <input keep="true">p0</input>
+            <output>dp_erw</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_flasche</input>
+            <input keep="true">pre_flasche_sicher</input>
+            <input keep="true">pre_ballon</input>
+            <input keep="true">pre_ballon_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_flasche</input>
+            <input keep="true">post_flasche_sicher</input>
+            <input keep="true">post_ballon</input>
+            <input keep="true">post_ballon_sicher</input>
+            <input keep="true">post_reifen</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Erwärmte Luft: steigt sie nur auf? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="„Warme Luft steigt auf“ ist eine richtige Beobachtung, wird aber oft als einzige Wirkung des Erwärmens verstanden. Im geschlossenen Glas kann die Luft nicht aufsteigen oder sich ausdehnen – stattdessen steigt der Druck, und zwar auch am Boden des Glases. Der Vergleich mit dem Gesetz von Gay-Lussac liefert die Teilchen-Erklärung als Ersatzvorstellung." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Warme Luft steigt auf“; Lernende erwarten, dass sich Volumen, Dichte und Druck beim Erwärmen nicht ändern (Schecker u. a. 2018, S. 250)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Bei konstantem Volumen gilt p/T = konstant (T in Kelvin). Von 20 °C auf 40 °C steigt der Druck um den Faktor 313/293 ≈ 1,07, also um etwa 70 hPa." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Druck steigt im warmen Bad um einige zehn hPa und fällt im kalten wieder. Die gemessene Änderung liegt meist etwas unter der Rechnung, weil der Sensor (im Gehäuse) etwas schneller warm wird als die gesamte Luft im Glas, oder weil der Deckel nicht ganz dicht ist." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Glas muss dicht sein (Gummidichtung). Nicht über etwa 50 °C erwärmen (Knopfzelle, Druck auf den Deckel). Funkverbindung durch Glas und Wasser vorher prüfen. Die Temperatur stammt vom BMP581 selbst und folgt der Lufttemperatur träge." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Eine verschlossene Flasche mit Luft wird erwärmt. Die Luft in der Flasche …" italic="true" size="0.85" />
+            <info label="1 = sammelt sich oben → warme Luft steigt nur auf
+            2 = drückt stärker gegen alle Wände → richtig
+            3 = verändert sich nicht → Luft ändert sich beim Erwärmen nicht" size="0.85" />
+            <info label="2. Über eine leere Flasche wird ein Luftballon gestülpt. Die Flasche kommt in heißes Wasser, der Ballon bläht sich auf. Ist unten in der Flasche jetzt noch Luft?" italic="true" size="0.85" />
+            <info label="1 = ja, die Luft ist überall in der Flasche → richtig
+            2 = nein, die Luft ist nach oben in den Ballon gestiegen → warme Luft steigt nur auf" size="0.85" />
+            <info label="3. Warme Luft nimmt genauso viel Platz ein wie kalte Luft." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Fahrradreifen liegt im Sommer in der prallen Sonne und wird heiß. Der Druck im Reifen …" italic="true" size="0.85" />
+            <info label="1 = steigt → richtig
+            2 = bleibt gleich → Erwärmen ändert die Luft nicht
+            3 = sinkt, weil die warme Luft nach oben steigt → warme Luft steigt nur auf" size="0.85" />
+            <info label="5 (nur Nachtest). Warum stieg der Druck im Glas?" italic="true" size="0.85" />
+            <info label="1 = Die warme Luft stieg nach oben zum Sensor. → warme Luft steigt nur auf
+            2 = Die Luftteilchen bewegen sich schneller und stoßen stärker gegen alle Wände. → richtig
+            3 = Das warme Wasser drückt von außen auf das Glas. → Ausweicherklärung" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = er steigt → ERWARTET" size="0.85" />
+            <info label="2 = er bleibt gleich → Luft ändert sich nicht" size="0.85" />
+            <info label="3 = er sinkt → Luft steigt weg / wird dünner" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Erwärmte Luft: steigt sie nur auf? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Eine verschlossene Flasche mit Luft wird erwärmt. Die Luft in der Flasche …" bold="true" />
+            <dropdown default="0">
+                <output>pre_flasche</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sammelt sich oben</map>
+                <map value="2">drückt stärker gegen alle Wände</map>
+                <map value="3">verändert sich nicht</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_flasche_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Über eine leere Flasche wird ein Luftballon gestülpt. Die Flasche kommt in heißes Wasser, der Ballon bläht sich auf. Ist unten in der Flasche jetzt noch Luft?" bold="true" />
+            <dropdown default="0">
+                <output>pre_ballon</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">ja, die Luft ist überall in der Flasche</map>
+                <map value="2">nein, die Luft ist nach oben in den Ballon gestiegen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_ballon_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Warme Luft nimmt genauso viel Platz ein wie kalte Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_platz</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_platz">
+                <input>pre_platz</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Erwärmte Luft: steigt sie nur auf? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst ein dicht schließendes Schraubglas, eine Schüssel mit warmem Wasser (etwa 40 °C, nicht heißer) und eine mit kaltem Wasser. Der mini kommt in das trockene Glas." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Was passiert mit dem Druck im geschlossenen Glas, wenn es in warmes Wasser gestellt wird?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">er steigt</map>
+                <map value="2">er bleibt gleich</map>
+                <map value="3">er sinkt</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Druck im Glas" labelX="Zeit" unitX="s" labelY="Druck" unitY="hPa" suppressScientificNotation="true" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">p</input>
+            </graph>
+            <graph visibility="vorhersage" label="Temperatur im Glas" labelX="Zeit" unitX="s" labelY="Temperatur" unitY="°C" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">Tb</input>
+            </graph>
+            <graph visibility="vorhersage" label="Druck über Temperatur" labelX="Temperatur" unitX="°C" labelY="Druck" unitY="hPa" style="dots" partialUpdate="false" suppressScientificNotation="true">
+                <input axis="x">Tb</input>
+                <input axis="y">p</input>
+            </graph>
+            <value visibility="vorhersage" label="Druck" precision="1" unit="hPa">
+                <input>p_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Temperatur" precision="1" unit="°C">
+                <input>Tb_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Glas verschließen" bold="true" />
+            <info visibility="vorhersage" label="Lege den mini ins Glas, schraube es fest zu und warte eine Minute. Tippe dann:" />
+            <button visibility="vorhersage" label="Glas zu: Anfangswerte festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p0</output>
+                <input type="buffer">Tb_avg</input>
+                <output>T0</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Warmes Wasserbad" bold="true" />
+            <info visibility="vorhersage" label="Stelle das Glas für etwa 3 Minuten bis zum Deckel in das warme Wasser. Tippe dann:" />
+            <button visibility="vorhersage" label="Nach 3 Minuten warm: festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p1</output>
+                <input type="buffer">Tb_avg</input>
+                <output>T1</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Druckänderung im warmen Wasser" precision="1" unit="hPa">
+                <input>dp_warm</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Kaltes Wasserbad" bold="true" />
+            <info visibility="vorhersage" label="Stelle das Glas jetzt für 3 Minuten in das kalte Wasser und tippe dann:" />
+            <button visibility="vorhersage" label="Nach 3 Minuten kalt: festhalten">
+                <input type="buffer">p_avg</input>
+                <output>p2</output>
+                <input type="buffer">Tb_avg</input>
+                <output>T2</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Druckänderung gegenüber dem Anfang" precision="1" unit="hPa">
+                <input>dp_kalt</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 5 – Vergleich mit der Rechnung" bold="true" />
+            <info visibility="vorhersage" label="Wenn die Luftteilchen bei höherer Temperatur stärker gegen alle Wände stoßen, wächst der Druck proportional zur absoluten Temperatur (in Kelvin). Erwartet wäre dann:" />
+            <value visibility="vorhersage" label="Erwartete Druckänderung (aus der Temperatur)" precision="1" unit="hPa">
+                <input>dp_erw</input>
+            </value>
+            <info visibility="vorhersage" label="Vergleiche mit der gemessenen Änderung. Der Sensor liegt unten im Glas – trotzdem steigt der Druck. Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Erwärmte Luft: steigt sie nur auf? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Eine verschlossene Flasche mit Luft wird erwärmt. Die Luft in der Flasche …" bold="true" />
+            <dropdown default="0">
+                <output>post_flasche</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sammelt sich oben</map>
+                <map value="2">drückt stärker gegen alle Wände</map>
+                <map value="3">verändert sich nicht</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_flasche_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Über eine leere Flasche wird ein Luftballon gestülpt. Die Flasche kommt in heißes Wasser, der Ballon bläht sich auf. Ist unten in der Flasche jetzt noch Luft?" bold="true" />
+            <dropdown default="0">
+                <output>post_ballon</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">ja, die Luft ist überall in der Flasche</map>
+                <map value="2">nein, die Luft ist nach oben in den Ballon gestiegen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_ballon_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Warme Luft nimmt genauso viel Platz ein wie kalte Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_platz</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_platz">
+                <input>post_platz</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Fahrradreifen liegt im Sommer in der prallen Sonne und wird heiß. Der Druck im Reifen …" bold="true" />
+            <dropdown default="0">
+                <output>post_reifen</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">steigt</map>
+                <map value="2">bleibt gleich</map>
+                <map value="3">sinkt, weil die warme Luft nach oben steigt</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum stieg der Druck im Glas?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Die warme Luft stieg nach oben zum Sensor.</map>
+                <map value="2">Die Luftteilchen bewegen sich schneller und stoßen stärker gegen alle Wände.</map>
+                <map value="3">Das warme Wasser drückt von außen auf das Glas.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">tp</data>
+            <data name="Druck (hPa)">p</data>
+            <data name="Temperatur (°C)">Tb</data>
+        </set>
+        <set name="Marker">
+            <data name="p Anfang (hPa)">p0</data>
+            <data name="T Anfang (°C)">T0</data>
+            <data name="p warm (hPa)">p1</data>
+            <data name="T warm (°C)">T1</data>
+            <data name="p kalt (hPa)">p2</data>
+            <data name="T kalt (°C)">T2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Druckänderung warm (hPa)">dp_warm</data>
+            <data name="Druckänderung kalt (hPa)">dp_kalt</data>
+            <data name="Erwartete Änderung (hPa)">dp_erw</data>
+            <data name="T Anfang (°C)">T0</data>
+            <data name="T warm (°C)">T1</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_flasche">pre_flasche</data>
+            <data name="pre_flasche_sicher">pre_flasche_sicher</data>
+            <data name="pre_ballon">pre_ballon</data>
+            <data name="pre_ballon_sicher">pre_ballon_sicher</data>
+            <data name="pre_platz">pre_platz</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_flasche">post_flasche</data>
+            <data name="post_flasche_sicher">post_flasche_sicher</data>
+            <data name="post_ballon">post_ballon</data>
+            <data name="post_ballon_sicher">post_ballon_sicher</data>
+            <data name="post_platz">post_platz</data>
+            <data name="post_reifen">post_reifen</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_erwaermen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_flasche" type="buffer" keep="true">pre_flasche</send>
+            <send id="pre_flasche_sicher" type="buffer" keep="true">pre_flasche_sicher</send>
+            <send id="pre_ballon" type="buffer" keep="true">pre_ballon</send>
+            <send id="pre_ballon_sicher" type="buffer" keep="true">pre_ballon_sicher</send>
+            <send id="pre_platz" type="buffer" keep="true">pre_platz</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_erwaermen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="dp_warm" type="buffer" keep="true">dp_warm</send>
+            <send id="dp_kalt" type="buffer" keep="true">dp_kalt</send>
+            <send id="dp_erw" type="buffer" keep="true">dp_erw</send>
+            <send id="T0" type="buffer" keep="true">T0</send>
+            <send id="T1" type="buffer" keep="true">T1</send>
+            <send id="post_flasche" type="buffer" keep="true">post_flasche</send>
+            <send id="post_flasche_sicher" type="buffer" keep="true">post_flasche_sicher</send>
+            <send id="post_ballon" type="buffer" keep="true">post_ballon</send>
+            <send id="post_ballon_sicher" type="buffer" keep="true">post_ballon_sicher</send>
+            <send id="post_platz" type="buffer" keep="true">post_platz</send>
+            <send id="post_reifen" type="buffer" keep="true">post_reifen</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

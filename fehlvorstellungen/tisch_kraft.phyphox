@@ -1,0 +1,472 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Übt der Tisch eine Kraft aus?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Beschleunigungssensor als Fühler für Berührkräfte: auf dem Tisch, auf der Hand, im Fall) und Nachtest zur Vorstellung „Passive Körper üben keine Kraft aus“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="52">a_win</container>
+        <container size="52">az_win</container>
+        <container size="312">a_win3</container>
+        <container size="1">a_avg</container>
+        <container size="1">az_avg</container>
+        <container size="1">a_min3</container>
+        <container size="1">a_tisch</container>
+        <container size="1">a_hand</container>
+        <container size="1">a_fall</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_buch</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_buch_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_hand</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_hand_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_tisch</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_buch</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_buch_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_hand</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_hand_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_tisch</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_auto</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 104 Hz, Bereich-Code 1, Drehraten-Code 0, float, 10 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01040100000A</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_win</output>
+        </append>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_win3</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <append>
+            <input keep="true">az</input>
+            <output>az_win</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">a_win</input>
+            <output as="average">a_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">az_win</input>
+            <output as="average">az_avg</output>
+        </average>
+        <min>
+            <input as="y" keep="true">a_win3</input>
+            <output as="min">a_min3</output>
+        </min>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_buch</input>
+            <input keep="true">pre_buch_sicher</input>
+            <input keep="true">pre_hand</input>
+            <input keep="true">pre_hand_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_buch</input>
+            <input keep="true">post_buch_sicher</input>
+            <input keep="true">post_hand</input>
+            <input keep="true">post_hand_sicher</input>
+            <input keep="true">post_auto</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Übt der Tisch eine Kraft aus? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Der Beschleunigungssensor wird als „Fühler für Berührkräfte“ eingeführt. Er zeigt auf dem Tisch dasselbe wie auf der Hand (etwa 9,8 m/s² nach oben) und im Fall 0. So wird die Kraft des Tisches sichtbar: Fehlt die Unterlage, fehlt die Kraft. Das Experiment ist kurz, braucht kein Material und ist die Grundlage für E09 bis E13." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Nur aktive Körper können Kräfte ausüben, passive leisten nur Widerstand“; „Tische üben keine Kraft auf ein darauf liegendes Buch aus“ (Schecker u. a. 2018, S. 78; Handout Schecker)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Ein Beschleunigungssensor misst die „spezifische Kraft“: die Summe aller Kräfte außer der Gravitation, geteilt durch die Masse (a − g). Ruht er auf dem Tisch, ist das die Normalkraft des Tisches pro Masse, also 9,81 m/s² nach oben. Im freien Fall wirkt nur die Gravitation, er zeigt 0." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Tisch und Hand je etwa 9,7–9,9 m/s² (kleiner Offset des Sensors möglich), im Fall unter etwa 1 m/s²." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Steht und fällt mit der Einführung des Sensors (Satz oben im Reiter Experiment). Ohne diese entsteht leicht die neue Fehlvorstellung „im Fall wirkt keine Schwerkraft“ – im Gespräch aufgreifen. Das Vorzeichen der z-Achse vorher prüfen: Mit der Oberseite nach oben auf dem Tisch sollte „zur Oberseite des mini“ erscheinen; sonst die Oberseite in der Anleitung anders benennen." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Buch liegt ruhig auf dem Tisch. Welche Kräfte wirken auf das Buch?" italic="true" size="0.85" />
+            <info label="1 = nur die Schwerkraft → passive Körper üben keine Kraft aus
+            2 = die Schwerkraft und eine Kraft vom Tisch nach oben → richtig
+            3 = keine, es bewegt sich ja nicht → Kraft nur bei Bewegung" size="0.85" />
+            <info label="2. Du hältst das Buch auf der flachen Hand statt auf dem Tisch. Wer übt eine Kraft nach oben auf das Buch aus?" italic="true" size="0.85" />
+            <info label="1 = die Hand und vorher auch der Tisch → richtig
+            2 = nur die Hand, der Tisch nicht → nur aktive Körper üben Kräfte aus
+            3 = keiner von beiden → Kraft nur bei Bewegung" size="0.85" />
+            <info label="3. Ein Tisch kann keine Kraft ausüben, er ist nur im Weg." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Auto fährt an. Wer übt die Kraft aus, die das Auto nach vorne beschleunigt?" italic="true" size="0.85" />
+            <info label="1 = der Motor → nur aktive Körper üben Kräfte aus
+            2 = die Straße (über die Reifen) → richtig
+            3 = niemand, das Auto beschleunigt sich selbst → Kraft als innere Eigenschaft" size="0.85" />
+            <info label="5 (nur Nachtest). Warum zeigte der Sensor während des Falls etwa 0?" italic="true" size="0.85" />
+            <info label="1 = Im Fall wirkt keine Schwerkraft. → neue Fehlvorstellung: keine Schwerkraft im Fall
+            2 = Nichts berührt den mini, also drückt ihn auch nichts. → richtig
+            3 = Der Sensor ist beim Fallen zu langsam. → Wegerklären" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = etwa 0, weil sich nichts bewegt → passive Körper üben keine Kraft aus" size="0.85" />
+            <info label="2 = etwa 9,8 m/s², nach oben gerichtet → ERWARTET" size="0.85" />
+            <info label="3 = etwa 9,8 m/s², nach unten gerichtet → Sensor misst die Schwerkraft" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Übt der Tisch eine Kraft aus? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Buch liegt ruhig auf dem Tisch. Welche Kräfte wirken auf das Buch?" bold="true" />
+            <dropdown default="0">
+                <output>pre_buch</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nur die Schwerkraft</map>
+                <map value="2">die Schwerkraft und eine Kraft vom Tisch nach oben</map>
+                <map value="3">keine, es bewegt sich ja nicht</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_buch_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Du hältst das Buch auf der flachen Hand statt auf dem Tisch. Wer übt eine Kraft nach oben auf das Buch aus?" bold="true" />
+            <dropdown default="0">
+                <output>pre_hand</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die Hand und vorher auch der Tisch</map>
+                <map value="2">nur die Hand, der Tisch nicht</map>
+                <map value="3">keiner von beiden</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_hand_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Ein Tisch kann keine Kraft ausüben, er ist nur im Weg." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_tisch</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_tisch">
+                <input>pre_tisch</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Übt der Tisch eine Kraft aus? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt." bold="false" />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Was zeigt der Sensor, wenn der mini ruhig auf dem Tisch liegt?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">etwa 0, weil sich nichts bewegt</map>
+                <map value="2">etwa 9,8 m/s², nach oben gerichtet</map>
+                <map value="3">etwa 9,8 m/s², nach unten gerichtet</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Betrag der gemessenen Beschleunigung" labelX="Zeit" unitX="s" labelY="|a|" unitY="m/s²" scaleMinY="fixed" scaleMaxY="fixed" minY="0" maxY="20" partialUpdate="true">
+                <input axis="x">ta</input>
+                <input axis="y">a_abs</input>
+            </graph>
+            <value visibility="vorhersage" label="Sensor zeigt" precision="1" unit="m/s²" size="2">
+                <input>a_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Richtung (z-Achse)" precision="1" positiveUnit="m/s², zur Oberseite des mini" negativeUnit="m/s², zur Unterseite des mini">
+                <input>az_avg</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Auf dem Tisch" bold="true" />
+            <info visibility="vorhersage" label="Lege den mini mit der Oberseite nach oben ruhig auf den Tisch und tippe:" />
+            <button visibility="vorhersage" label="Wert auf dem Tisch festhalten">
+                <input type="buffer">a_avg</input>
+                <output>a_tisch</output>
+            </button>
+            <value visibility="vorhersage" label="Auf dem Tisch" precision="2" unit="m/s²">
+                <input>a_tisch</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Auf der flachen Hand" bold="true" />
+            <info visibility="vorhersage" label="Lege den mini auf deine flache, ruhige Hand und tippe:" />
+            <button visibility="vorhersage" label="Wert auf der Hand festhalten">
+                <input type="buffer">a_avg</input>
+                <output>a_hand</output>
+            </button>
+            <value visibility="vorhersage" label="Auf der Hand" precision="2" unit="m/s²">
+                <input>a_hand</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Ohne Unterlage" bold="true" />
+            <info visibility="vorhersage" label="Halte den mini auf der flachen Hand über ein Kissen und ziehe die Hand schnell nach unten weg (oder lass ihn aus 30 cm auf das Kissen fallen). Tippe innerhalb von 3 Sekunden:" />
+            <value visibility="vorhersage" label="Kleinster Wert der letzten 3 s" precision="2" unit="m/s²">
+                <input>a_min3</input>
+            </value>
+            <button visibility="vorhersage" label="Kleinsten Wert festhalten">
+                <input type="buffer">a_min3</input>
+                <output>a_fall</output>
+            </button>
+            <value visibility="vorhersage" label="Ohne Unterlage (im Fall)" precision="2" unit="m/s²">
+                <input>a_fall</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Tisch und Hand zeigen dasselbe. Was macht der Tisch also mit dem mini? Und was fehlt, wenn die Unterlage weg ist? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Übt der Tisch eine Kraft aus? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Buch liegt ruhig auf dem Tisch. Welche Kräfte wirken auf das Buch?" bold="true" />
+            <dropdown default="0">
+                <output>post_buch</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nur die Schwerkraft</map>
+                <map value="2">die Schwerkraft und eine Kraft vom Tisch nach oben</map>
+                <map value="3">keine, es bewegt sich ja nicht</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_buch_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Du hältst das Buch auf der flachen Hand statt auf dem Tisch. Wer übt eine Kraft nach oben auf das Buch aus?" bold="true" />
+            <dropdown default="0">
+                <output>post_hand</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die Hand und vorher auch der Tisch</map>
+                <map value="2">nur die Hand, der Tisch nicht</map>
+                <map value="3">keiner von beiden</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_hand_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Ein Tisch kann keine Kraft ausüben, er ist nur im Weg." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_tisch</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_tisch">
+                <input>post_tisch</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Auto fährt an. Wer übt die Kraft aus, die das Auto nach vorne beschleunigt?" bold="true" />
+            <dropdown default="0">
+                <output>post_auto</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">der Motor</map>
+                <map value="2">die Straße (über die Reifen)</map>
+                <map value="3">niemand, das Auto beschleunigt sich selbst</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum zeigte der Sensor während des Falls etwa 0?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Im Fall wirkt keine Schwerkraft.</map>
+                <map value="2">Nichts berührt den mini, also drückt ihn auch nichts.</map>
+                <map value="3">Der Sensor ist beim Fallen zu langsam.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">ta</data>
+            <data name="a_x (m/s²)">ax</data>
+            <data name="a_y (m/s²)">ay</data>
+            <data name="a_z (m/s²)">az</data>
+            <data name="|a| (m/s²)">a_abs</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Wert auf dem Tisch (m/s2)">a_tisch</data>
+            <data name="Wert auf der Hand (m/s2)">a_hand</data>
+            <data name="Wert im Fall (m/s2)">a_fall</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_buch">pre_buch</data>
+            <data name="pre_buch_sicher">pre_buch_sicher</data>
+            <data name="pre_hand">pre_hand</data>
+            <data name="pre_hand_sicher">pre_hand_sicher</data>
+            <data name="pre_tisch">pre_tisch</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_buch">post_buch</data>
+            <data name="post_buch_sicher">post_buch_sicher</data>
+            <data name="post_hand">post_hand</data>
+            <data name="post_hand_sicher">post_hand_sicher</data>
+            <data name="post_tisch">post_tisch</data>
+            <data name="post_auto">post_auto</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=tisch_kraft" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_buch" type="buffer" keep="true">pre_buch</send>
+            <send id="pre_buch_sicher" type="buffer" keep="true">pre_buch_sicher</send>
+            <send id="pre_hand" type="buffer" keep="true">pre_hand</send>
+            <send id="pre_hand_sicher" type="buffer" keep="true">pre_hand_sicher</send>
+            <send id="pre_tisch" type="buffer" keep="true">pre_tisch</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=tisch_kraft" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="a_tisch" type="buffer" keep="true">a_tisch</send>
+            <send id="a_hand" type="buffer" keep="true">a_hand</send>
+            <send id="a_fall" type="buffer" keep="true">a_fall</send>
+            <send id="post_buch" type="buffer" keep="true">post_buch</send>
+            <send id="post_buch_sicher" type="buffer" keep="true">post_buch_sicher</send>
+            <send id="post_hand" type="buffer" keep="true">post_hand</send>
+            <send id="post_hand_sicher" type="buffer" keep="true">post_hand_sicher</send>
+            <send id="post_tisch" type="buffer" keep="true">post_tisch</send>
+            <send id="post_auto" type="buffer" keep="true">post_auto</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

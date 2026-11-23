@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Fällt Schweres schneller?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Fallzeit mit und ohne Zusatzmasse aus dem Beschleunigungssensor) und Nachtest zur Vorstellung „Je schwerer, desto schneller fällt ein Körper“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="0">a_free</container>
+        <container size="1">n_free</container>
+        <container size="1">n_all</container>
+        <container size="1">ta_first</container>
+        <container size="1">ta_last</container>
+        <container size="1">dt_s</container>
+        <container size="1">t_free</container>
+        <container size="1">a_free_avg</container>
+        <container size="1">f_l1</container>
+        <container size="1">f_l2</container>
+        <container size="1">f_l3</container>
+        <container size="1">f_s1</container>
+        <container size="1">f_s2</container>
+        <container size="1">f_s3</container>
+        <container size="1">f_leicht</container>
+        <container size="1">f_schwer</container>
+        <container size="1">f_diff</container>
+        <container size="1" init="5" clearGroup="_">m_leicht</container>
+        <container size="1" init="10" clearGroup="_">m_schwer</container>
+        <container size="1">t_theo</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_kugeln</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_kugeln_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_pendel</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_pendel_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_schwer</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kugeln</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kugeln_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_pendel</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_pendel_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schwer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_mond</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 416 Hz, Bereich-Code 1, Drehraten-Code 0, float, 15 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01060100000F</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <rangefilter>
+            <input keep="true">a_abs</input>
+            <input as="min" type="value">0</input>
+            <input as="max" type="value">2.5</input>
+            <output>a_free</output>
+        </rangefilter>
+        <count>
+            <input as="buffer" keep="true">a_free</input>
+            <output as="count">n_free</output>
+        </count>
+        <count>
+            <input as="buffer" keep="true">ta</input>
+            <output as="count">n_all</output>
+        </count>
+        <first>
+            <input as="value" keep="true">ta</input>
+            <output as="first">ta_first</output>
+        </first>
+        <append>
+            <input keep="true">ta</input>
+            <output>ta_last</output>
+        </append>
+        <formula formula="([3]-[2])/([4]-1)">
+            <input keep="true">n_free</input>
+            <input keep="true">ta_first</input>
+            <input keep="true">ta_last</input>
+            <input keep="true">n_all</input>
+            <output>dt_s</output>
+        </formula>
+        <formula formula="[1]*[2]">
+            <input keep="true">n_free</input>
+            <input keep="true">dt_s</input>
+            <output>t_free</output>
+        </formula>
+        <average>
+            <input as="buffer" keep="true">a_free</input>
+            <output as="average">a_free_avg</output>
+        </average>
+        <formula formula="([1]+[2]+[3])/3">
+            <input keep="true">f_l1</input>
+            <input keep="true">f_l2</input>
+            <input keep="true">f_l3</input>
+            <output>f_leicht</output>
+        </formula>
+        <formula formula="([1]+[2]+[3])/3">
+            <input keep="true">f_s1</input>
+            <input keep="true">f_s2</input>
+            <input keep="true">f_s3</input>
+            <output>f_schwer</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">f_schwer</input>
+            <input keep="true">f_leicht</input>
+            <output>f_diff</output>
+        </formula>
+        <formula formula="sqrt(2*1/9.81)">
+            <output>t_theo</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_kugeln</input>
+            <input keep="true">pre_kugeln_sicher</input>
+            <input keep="true">pre_pendel</input>
+            <input keep="true">pre_pendel_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_kugeln</input>
+            <input keep="true">post_kugeln_sicher</input>
+            <input keep="true">post_pendel</input>
+            <input keep="true">post_pendel_sicher</input>
+            <input keep="true">post_mond</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Fällt Schweres schneller? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden messen die Fallzeit mit und ohne Zusatzmasse je dreimal und vergleichen. Die Fallzeit wird automatisch aus dem Sensor bestimmt (Dauer der Phase mit |a| nahe 0), sodass sie viel genauer ist als mit der Stoppuhr. Ersatzvorstellung: Größere Masse heißt größere Schwerkraft, aber auch größere Trägheit – beide heben sich auf." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Je schwerer, desto schneller (Fallbewegung)“ (Handout Schecker)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Ohne Luftwiderstand gilt t = √(2h/g), unabhängig von der Masse. Für 1 m sind das 0,45 s. Bei einem kompakten Körper wie dem mini ist der Luftwiderstand auf 1 m vernachlässigbar (unter 1 ms)." />
+            <separator height="2" />
+            <info label="Auswertung" bold="true" />
+            <info label="Fallzeit = Anzahl der Messwerte mit |a| unter 2,5 m/s² mal Abtastabstand (aus den Zeitstempeln, 416 Hz, also etwa 2,4 ms Auflösung). Deshalb vor jedem Fall „Neuer Fall“ tippen. Die Speicher-Knöpfe zeigen ein Häkchen, wenn ein Wert gespeichert ist (neue Button-Beschriftung über dynamicLabel). Schwankungen kommen vor allem von der Fallhöhe." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Stoßbelastung beim Aufprall: immer auf ein dickes Kissen. Münzen fest verkleben, sie dürfen sich im Fall nicht lösen. Die Pendel-Variante aus dem Konzeptpapier ist hier nicht umgesetzt (wäre mit der Drehrate möglich)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Eine Metallkugel und eine gleich große, halb so schwere Kugel werden gleichzeitig vom Tisch fallen gelassen. Welche ist zuerst unten?" italic="true" size="0.85" />
+            <info label="1 = die schwere, deutlich früher → je schwerer, desto schneller
+            2 = beide etwa gleichzeitig → richtig
+            3 = die leichte → unklare Vorstellung" size="0.85" />
+            <info label="2. Ein Pendel bekommt ein doppelt so schweres Gewicht (gleiche Fadenlänge). Es schwingt dann …" italic="true" size="0.85" />
+            <info label="1 = schneller → je schwerer, desto schneller
+            2 = gleich schnell → richtig
+            3 = langsamer → schwer = träge/langsam" size="0.85" />
+            <info label="3. Schwere Dinge fallen schneller als leichte." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Auf dem Mond (ohne Luft) lässt ein Astronaut einen Hammer und eine Feder gleichzeitig aus gleicher Höhe fallen." italic="true" size="0.85" />
+            <info label="1 = Der Hammer ist zuerst unten. → je schwerer, desto schneller
+            2 = Beide kommen gleichzeitig an. → richtig
+            3 = Die Feder ist zuerst unten. → unklare Vorstellung" size="0.85" />
+            <info label="5 (nur Nachtest). Warum fielen beide gleich lang?" italic="true" size="0.85" />
+            <info label="1 = Die Münzen waren zu leicht, um einen Unterschied zu machen. → Wegerklären
+            2 = Auf den schwereren wirkt eine größere Schwerkraft, er ist aber auch entsprechend schwerer in Bewegung zu bringen. → richtig
+            3 = Die Messung ist zu ungenau. → Wegerklären" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = mit Münzen deutlich kürzer → je schwerer, desto schneller" size="0.85" />
+            <info label="2 = beide etwa gleich → ERWARTET" size="0.85" />
+            <info label="3 = mit Münzen länger → unklare Vorstellung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Fällt Schweres schneller? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Eine Metallkugel und eine gleich große, halb so schwere Kugel werden gleichzeitig vom Tisch fallen gelassen. Welche ist zuerst unten?" bold="true" />
+            <dropdown default="0">
+                <output>pre_kugeln</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die schwere, deutlich früher</map>
+                <map value="2">beide etwa gleichzeitig</map>
+                <map value="3">die leichte</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_kugeln_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Pendel bekommt ein doppelt so schweres Gewicht (gleiche Fadenlänge). Es schwingt dann …" bold="true" />
+            <dropdown default="0">
+                <output>pre_pendel</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">schneller</map>
+                <map value="2">gleich schnell</map>
+                <map value="3">langsamer</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_pendel_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Schwere Dinge fallen schneller als leichte." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_schwer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_schwer">
+                <input>pre_schwer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Fällt Schweres schneller? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt. Im freien Fall zeigt er deshalb etwa 0 – daraus bestimmt phyphox die Fallzeit." />
+            <info label="Du brauchst ein dickes Kissen, ein Maßband und einige Münzen, die du fest mit Klebeband am mini befestigst (etwa so schwer wie der mini selbst)." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Der mini fällt einmal allein und einmal mit aufgeklebten Münzen (etwa doppelte Masse) aus 1 m Höhe. Welche Fallzeit ist kürzer?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">mit Münzen deutlich kürzer</map>
+                <map value="2">beide etwa gleich</map>
+                <map value="3">mit Münzen länger</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Betrag der gemessenen Beschleunigung" labelX="Zeit" unitX="s" labelY="|a|" unitY="m/s²" scaleMinY="fixed" scaleMaxY="fixed" minY="0" maxY="30" partialUpdate="false">
+                <input axis="x">ta</input>
+                <input axis="y">a_abs</input>
+            </graph>
+            <value visibility="vorhersage" label="Fallzeit dieses Versuchs" precision="3" unit="s" size="1.5">
+                <input>t_free</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Fallen lassen" bold="true" />
+            <info visibility="vorhersage" label="Tippe vor jedem Fall auf „Neuer Fall“. Halte den mini ruhig 1 m über dem Kissen und lass ihn los, ohne ihn anzustoßen. Speichere die Fallzeit danach im passenden Feld." />
+            <button visibility="vorhersage" label="Neuer Fall">
+                <input type="empty"></input>
+                <output>ta</output>
+                <input type="empty"></input>
+                <output>ax</output>
+                <input type="empty"></input>
+                <output>ay</output>
+                <input type="empty"></input>
+                <output>az</output>
+                <input type="empty"></input>
+                <output>a_abs</output>
+            </button>
+            <info visibility="vorhersage" label="Ohne Münzen:" bold="true" />
+            <button visibility="vorhersage" label="Speichern: ohne Münzen, Versuch 1" dynamicLabel="f_l1">
+                <input type="buffer">t_free</input>
+                <output>f_l1</output>
+                <map min="0.001">✓ ohne Münzen, Versuch 1 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <button visibility="vorhersage" label="Speichern: ohne Münzen, Versuch 2" dynamicLabel="f_l2">
+                <input type="buffer">t_free</input>
+                <output>f_l2</output>
+                <map min="0.001">✓ ohne Münzen, Versuch 2 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <button visibility="vorhersage" label="Speichern: ohne Münzen, Versuch 3" dynamicLabel="f_l3">
+                <input type="buffer">t_free</input>
+                <output>f_l3</output>
+                <map min="0.001">✓ ohne Münzen, Versuch 3 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <info visibility="vorhersage" label="Klebe jetzt die Münzen fest an den mini. Mit Münzen:" bold="true" />
+            <button visibility="vorhersage" label="Speichern: mit Münzen, Versuch 1" dynamicLabel="f_s1">
+                <input type="buffer">t_free</input>
+                <output>f_s1</output>
+                <map min="0.001">✓ mit Münzen, Versuch 1 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <button visibility="vorhersage" label="Speichern: mit Münzen, Versuch 2" dynamicLabel="f_s2">
+                <input type="buffer">t_free</input>
+                <output>f_s2</output>
+                <map min="0.001">✓ mit Münzen, Versuch 2 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <button visibility="vorhersage" label="Speichern: mit Münzen, Versuch 3" dynamicLabel="f_s3">
+                <input type="buffer">t_free</input>
+                <output>f_s3</output>
+                <map min="0.001">✓ mit Münzen, Versuch 3 gespeichert (erneut tippen ersetzt)</map>
+            </button>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Vergleich" bold="true" />
+            <value visibility="vorhersage" label="Mittlere Fallzeit ohne Münzen" precision="3" unit="s">
+                <input>f_leicht</input>
+            </value>
+            <value visibility="vorhersage" label="Mittlere Fallzeit mit Münzen" precision="3" unit="s">
+                <input>f_schwer</input>
+            </value>
+            <value visibility="vorhersage" label="Unterschied (mit − ohne)" precision="0" unit="ms" factor="1000" size="1.5">
+                <input>f_diff</input>
+            </value>
+            <value visibility="vorhersage" label="Zum Vergleich: berechnet für 1 m" precision="3" unit="s">
+                <input>t_theo</input>
+            </value>
+            <edit visibility="vorhersage" label="Masse ohne Münzen (optional)" unit="g" default="5" signed="false">
+                <output>m_leicht</output>
+            </edit>
+            <edit visibility="vorhersage" label="Masse mit Münzen (optional)" unit="g" default="10" signed="false">
+                <output>m_schwer</output>
+            </edit>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Ist der Unterschied größer als die Schwankung zwischen den drei Versuchen? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Fällt Schweres schneller? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Eine Metallkugel und eine gleich große, halb so schwere Kugel werden gleichzeitig vom Tisch fallen gelassen. Welche ist zuerst unten?" bold="true" />
+            <dropdown default="0">
+                <output>post_kugeln</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die schwere, deutlich früher</map>
+                <map value="2">beide etwa gleichzeitig</map>
+                <map value="3">die leichte</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_kugeln_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Pendel bekommt ein doppelt so schweres Gewicht (gleiche Fadenlänge). Es schwingt dann …" bold="true" />
+            <dropdown default="0">
+                <output>post_pendel</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">schneller</map>
+                <map value="2">gleich schnell</map>
+                <map value="3">langsamer</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_pendel_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Schwere Dinge fallen schneller als leichte." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_schwer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_schwer">
+                <input>post_schwer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Auf dem Mond (ohne Luft) lässt ein Astronaut einen Hammer und eine Feder gleichzeitig aus gleicher Höhe fallen." bold="true" />
+            <dropdown default="0">
+                <output>post_mond</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Der Hammer ist zuerst unten.</map>
+                <map value="2">Beide kommen gleichzeitig an.</map>
+                <map value="3">Die Feder ist zuerst unten.</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum fielen beide gleich lang?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Die Münzen waren zu leicht, um einen Unterschied zu machen.</map>
+                <map value="2">Auf den schwereren wirkt eine größere Schwerkraft, er ist aber auch entsprechend schwerer in Bewegung zu bringen.</map>
+                <map value="3">Die Messung ist zu ungenau.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Letzter Fall">
+            <data name="Zeit (s)">ta</data>
+            <data name="|a| (m/s²)">a_abs</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Fallzeit ohne Münzen (s)">f_leicht</data>
+            <data name="Fallzeit mit Münzen (s)">f_schwer</data>
+            <data name="Unterschied (s)">f_diff</data>
+            <data name="Masse leicht (g)">m_leicht</data>
+            <data name="Masse schwer (g)">m_schwer</data>
+            <data name="Fallzeit ohne Münzen, Versuch 1 (s)">f_l1</data>
+            <data name="Fallzeit ohne Münzen, Versuch 2 (s)">f_l2</data>
+            <data name="Fallzeit ohne Münzen, Versuch 3 (s)">f_l3</data>
+            <data name="Fallzeit mit Münzen, Versuch 1 (s)">f_s1</data>
+            <data name="Fallzeit mit Münzen, Versuch 2 (s)">f_s2</data>
+            <data name="Fallzeit mit Münzen, Versuch 3 (s)">f_s3</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_kugeln">pre_kugeln</data>
+            <data name="pre_kugeln_sicher">pre_kugeln_sicher</data>
+            <data name="pre_pendel">pre_pendel</data>
+            <data name="pre_pendel_sicher">pre_pendel_sicher</data>
+            <data name="pre_schwer">pre_schwer</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_kugeln">post_kugeln</data>
+            <data name="post_kugeln_sicher">post_kugeln_sicher</data>
+            <data name="post_pendel">post_pendel</data>
+            <data name="post_pendel_sicher">post_pendel_sicher</data>
+            <data name="post_schwer">post_schwer</data>
+            <data name="post_mond">post_mond</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=fallzeit" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_kugeln" type="buffer" keep="true">pre_kugeln</send>
+            <send id="pre_kugeln_sicher" type="buffer" keep="true">pre_kugeln_sicher</send>
+            <send id="pre_pendel" type="buffer" keep="true">pre_pendel</send>
+            <send id="pre_pendel_sicher" type="buffer" keep="true">pre_pendel_sicher</send>
+            <send id="pre_schwer" type="buffer" keep="true">pre_schwer</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=fallzeit" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="f_leicht" type="buffer" keep="true">f_leicht</send>
+            <send id="f_schwer" type="buffer" keep="true">f_schwer</send>
+            <send id="f_diff" type="buffer" keep="true">f_diff</send>
+            <send id="m_leicht" type="buffer" keep="true">m_leicht</send>
+            <send id="m_schwer" type="buffer" keep="true">m_schwer</send>
+            <send id="f_l1" type="buffer" keep="true">f_l1</send>
+            <send id="f_l2" type="buffer" keep="true">f_l2</send>
+            <send id="f_l3" type="buffer" keep="true">f_l3</send>
+            <send id="f_s1" type="buffer" keep="true">f_s1</send>
+            <send id="f_s2" type="buffer" keep="true">f_s2</send>
+            <send id="f_s3" type="buffer" keep="true">f_s3</send>
+            <send id="post_kugeln" type="buffer" keep="true">post_kugeln</send>
+            <send id="post_kugeln_sicher" type="buffer" keep="true">post_kugeln_sicher</send>
+            <send id="post_pendel" type="buffer" keep="true">post_pendel</send>
+            <send id="post_pendel_sicher" type="buffer" keep="true">post_pendel_sicher</send>
+            <send id="post_schwer" type="buffer" keep="true">post_schwer</send>
+            <send id="post_mond" type="buffer" keep="true">post_mond</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

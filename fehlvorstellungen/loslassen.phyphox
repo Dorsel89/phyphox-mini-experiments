@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Was passiert beim Loslassen?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Beschleunigungssensor an einer Schnur im Kreis geschleudert und losgelassen) und Nachtest zur Vorstellung „Die Kreisbewegung prägt sich dem Körper ein“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="1">a_max</container>
+        <container size="1">t_p1</container>
+        <container size="1">t_p2</container>
+        <container size="1">dt_los</container>
+        <container size="1">dt_s</container>
+        <container size="1">n_all</container>
+        <container size="1">ta_first</container>
+        <container size="1">ta_last</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_bahn</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_bahn_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_hammer</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_hammer_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_kreis</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_bahn</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_bahn_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_hammer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_hammer_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kreis</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_schleuder</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 208 Hz, Bereich-Code 1, Drehraten-Code 0, float, 15 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">01050100000F</config>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <max>
+            <input as="y" keep="true">a_abs</input>
+            <output as="max">a_max</output>
+        </max>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_p2</input>
+            <input keep="true">t_p1</input>
+            <output>dt_los</output>
+        </formula>
+        <count>
+            <input as="buffer" keep="true">ta</input>
+            <output as="count">n_all</output>
+        </count>
+        <first>
+            <input as="value" keep="true">ta</input>
+            <output as="first">ta_first</output>
+        </first>
+        <append>
+            <input keep="true">ta</input>
+            <output>ta_last</output>
+        </append>
+        <formula formula="([2]-[1])/([3]-1)">
+            <input keep="true">ta_first</input>
+            <input keep="true">ta_last</input>
+            <input keep="true">n_all</input>
+            <output>dt_s</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_bahn</input>
+            <input keep="true">pre_bahn_sicher</input>
+            <input keep="true">pre_hammer</input>
+            <input keep="true">pre_hammer_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_bahn</input>
+            <input keep="true">post_bahn_sicher</input>
+            <input keep="true">post_hammer</input>
+            <input keep="true">post_hammer_sicher</input>
+            <input keep="true">post_schleuder</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Was passiert beim Loslassen? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Solange die Schnur zieht, misst der Sensor einen großen Wert; im Moment des Loslassens springt der Betrag auf etwa 0, ohne Abklingen. Gemessen wird nicht die Bahn, sondern das Fehlen einer Kraft – der Erklärtext und die Nachtestfragen stellen die Verbindung zur geraden Bahn her." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Die Bewegungsform prägt sich dem bewegten Objekt ein“; ein losgelassener, im Kreis geschleuderter Ball fliege auf einer gekrümmten Bahn weiter (Schecker u. a. 2018, S. 69; Aufgabe nach dem Force Concept Inventory)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Die Schnurkraft liefert die Zentripetalkraft m·ω²·r. Bei 2 Umdrehungen pro Sekunde und r = 0,5 m sind das etwa 79 m/s² (8 g). Nach dem Loslassen wirkt waagerecht keine Kraft mehr, der Körper bewegt sich tangential geradeaus weiter (und fällt durch die Schwerkraft)." />
+            <separator height="2" />
+            <info label="Neue phyphox-Funktion" bold="true" />
+            <info label="Mit der Datenauswahl (Data Picker, ab phyphox 1.2.1) wählen die Lernenden den letzten Punkt mit Schnurkraft und den ersten mit 0. Die Zeit dazwischen liegt im Bereich eines Messpunktabstands (rund 5 ms bei 208 Hz)." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Sicherheitsrisiko beim Schleudern: nur im Freien oder in der Turnhalle, Abstand zu anderen, weiche Landung. Der Beutel darf beim Loslassen nicht an der Schnur hängen bleiben (Schnur fest am Beutel, Ende loslassen). Die Bildfrage aus dem Konzeptpapier ist hier in Worten formuliert; ein Bild ließe sich mit dem image-Element (res-Ordner) ergänzen." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Ball an einer Schnur wird waagerecht im Kreis geschleudert und dann losgelassen. Welchen Weg nimmt er direkt danach (Sicht von oben)?" italic="true" size="0.85" />
+            <info label="1 = er fliegt auf einer gekrümmten Bahn weiter → Bewegungsform prägt sich ein
+            2 = er fliegt geradeaus weiter, in die Richtung, in die er sich gerade bewegt hat → richtig
+            3 = er fliegt gerade nach außen, von der Mitte weg → Zentrifugalkraft" size="0.85" />
+            <info label="2. Ein Hammerwerfer lässt den Hammer los. Welche Kraft wirkt unmittelbar danach in waagerechter Richtung auf den Hammer (ohne Luft)?" italic="true" size="0.85" />
+            <info label="1 = noch die Kreiskraft, die langsam abklingt → Bewegungsform prägt sich ein
+            2 = keine → richtig
+            3 = eine Kraft nach außen → Zentrifugalkraft" size="0.85" />
+            <info label="3. Ein Körper, der im Kreis bewegt wurde, behält die Kreisbewegung noch kurz bei." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Wassertropfen fliegen aus einer sich drehenden Salatschleuder. Wie fliegen sie vom Korb weg (Sicht von oben)?" italic="true" size="0.85" />
+            <info label="1 = in Spiralen weiter um die Mitte → Bewegungsform prägt sich ein
+            2 = geradeaus, in Richtung der Bewegung am Rand → richtig
+            3 = gerade nach außen → Zentrifugalkraft" size="0.85" />
+            <info label="5 (nur Nachtest). Was zeigte der Sensor direkt nach dem Loslassen?" italic="true" size="0.85" />
+            <info label="1 = eine Kraft, die langsam abklingt → Bewegungsform prägt sich ein
+            2 = sofort etwa 0 – ohne Kraft gibt es keine Kurve mehr → richtig
+            3 = eine Kraft nach außen → Zentrifugalkraft" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = noch eine Weile die Kreis-Kraft, die langsam abklingt → Bewegungsform prägt sich ein" size="0.85" />
+            <info label="2 = sofort nichts mehr (etwa 0) → ERWARTET" size="0.85" />
+            <info label="3 = zuerst eine Kraft nach außen → Zentrifugalkraft" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Was passiert beim Loslassen? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Ball an einer Schnur wird waagerecht im Kreis geschleudert und dann losgelassen. Welchen Weg nimmt er direkt danach (Sicht von oben)?" bold="true" />
+            <dropdown default="0">
+                <output>pre_bahn</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">er fliegt auf einer gekrümmten Bahn weiter</map>
+                <map value="2">er fliegt geradeaus weiter, in die Richtung, in die er sich gerade bewegt hat</map>
+                <map value="3">er fliegt gerade nach außen, von der Mitte weg</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_bahn_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Hammerwerfer lässt den Hammer los. Welche Kraft wirkt unmittelbar danach in waagerechter Richtung auf den Hammer (ohne Luft)?" bold="true" />
+            <dropdown default="0">
+                <output>pre_hammer</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">noch die Kreiskraft, die langsam abklingt</map>
+                <map value="2">keine</map>
+                <map value="3">eine Kraft nach außen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_hammer_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Ein Körper, der im Kreis bewegt wurde, behält die Kreisbewegung noch kurz bei." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_kreis</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_kreis">
+                <input>pre_kreis</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Was passiert beim Loslassen? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt." />
+            <info label="Du brauchst einen kleinen, festen Beutel für den mini, etwa 50 cm Schnur und eine große freie Fläche mit weicher Landung (Wiese, Turnmatte). Niemand darf im Umkreis stehen!" />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Was fühlt der Sensor direkt nach dem Loslassen?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">noch eine Weile die Kreis-Kraft, die langsam abklingt</map>
+                <map value="2">sofort nichts mehr (etwa 0)</map>
+                <map value="3">zuerst eine Kraft nach außen</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Betrag der gemessenen Beschleunigung" labelX="Zeit" unitX="s" labelY="|a|" unitY="m/s²" scaleMinY="fixed" minY="0" partialUpdate="false" pickLabel="Loslassen untersuchen">
+                <input axis="x">ta</input>
+                <input axis="y">a_abs</input>
+                <output axis="x" label="Letzter Punkt mit Schnurkraft">t_p1</output>
+                <output axis="x" label="Erster Punkt mit etwa 0">t_p2</output>
+            </graph>
+            <value visibility="vorhersage" label="Größter Wert" precision="1" unit="m/s²">
+                <input>a_max</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Schleudern und loslassen" bold="true" />
+            <info visibility="vorhersage" label="Tippe auf „Neuer Versuch“. Schleudere den mini im Beutel waagerecht über dem Kopf im Kreis (etwa 2 Umdrehungen pro Sekunde) und lass die Schnur los." />
+            <button visibility="vorhersage" label="Neuer Versuch">
+                <input type="empty"></input>
+                <output>ta</output>
+                <input type="empty"></input>
+                <output>ax</output>
+                <input type="empty"></input>
+                <output>ay</output>
+                <input type="empty"></input>
+                <output>az</output>
+                <input type="empty"></input>
+                <output>a_abs</output>
+            </button>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Wie schnell verschwindet die Kraft?" bold="true" />
+            <info visibility="vorhersage" label="Tippe auf das Diagramm und dann auf „Loslassen untersuchen“. Wähle den letzten Punkt, an dem die Schnur noch zieht, und den ersten Punkt mit etwa 0." />
+            <value visibility="vorhersage" label="Zeit zwischen Schnurkraft und 0" precision="0" unit="ms" factor="1000" size="1.5">
+                <input>dt_los</input>
+            </value>
+            <value visibility="vorhersage" label="Abstand zweier Messpunkte" precision="1" unit="ms" factor="1000">
+                <input>dt_s</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Wenn die Kraft sofort verschwindet: Was bedeutet das für die Bahn? Ohne Kraft zur Mitte gibt es keine Kurve. Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Was passiert beim Loslassen? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Ball an einer Schnur wird waagerecht im Kreis geschleudert und dann losgelassen. Welchen Weg nimmt er direkt danach (Sicht von oben)?" bold="true" />
+            <dropdown default="0">
+                <output>post_bahn</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">er fliegt auf einer gekrümmten Bahn weiter</map>
+                <map value="2">er fliegt geradeaus weiter, in die Richtung, in die er sich gerade bewegt hat</map>
+                <map value="3">er fliegt gerade nach außen, von der Mitte weg</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_bahn_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein Hammerwerfer lässt den Hammer los. Welche Kraft wirkt unmittelbar danach in waagerechter Richtung auf den Hammer (ohne Luft)?" bold="true" />
+            <dropdown default="0">
+                <output>post_hammer</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">noch die Kreiskraft, die langsam abklingt</map>
+                <map value="2">keine</map>
+                <map value="3">eine Kraft nach außen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_hammer_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Ein Körper, der im Kreis bewegt wurde, behält die Kreisbewegung noch kurz bei." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_kreis</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_kreis">
+                <input>post_kreis</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Wassertropfen fliegen aus einer sich drehenden Salatschleuder. Wie fliegen sie vom Korb weg (Sicht von oben)?" bold="true" />
+            <dropdown default="0">
+                <output>post_schleuder</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">in Spiralen weiter um die Mitte</map>
+                <map value="2">geradeaus, in Richtung der Bewegung am Rand</map>
+                <map value="3">gerade nach außen</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Was zeigte der Sensor direkt nach dem Loslassen?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">eine Kraft, die langsam abklingt</map>
+                <map value="2">sofort etwa 0 – ohne Kraft gibt es keine Kurve mehr</map>
+                <map value="3">eine Kraft nach außen</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">ta</data>
+            <data name="a_x (m/s²)">ax</data>
+            <data name="a_y (m/s²)">ay</data>
+            <data name="a_z (m/s²)">az</data>
+            <data name="|a| (m/s²)">a_abs</data>
+        </set>
+        <set name="Auswahl">
+            <data name="letzter Punkt Schnur (s)">t_p1</data>
+            <data name="erster Punkt 0 (s)">t_p2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Größter Wert (m/s2)">a_max</data>
+            <data name="Zeit bis 0 (s)">dt_los</data>
+            <data name="Abtastabstand (s)">dt_s</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_bahn">pre_bahn</data>
+            <data name="pre_bahn_sicher">pre_bahn_sicher</data>
+            <data name="pre_hammer">pre_hammer</data>
+            <data name="pre_hammer_sicher">pre_hammer_sicher</data>
+            <data name="pre_kreis">pre_kreis</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_bahn">post_bahn</data>
+            <data name="post_bahn_sicher">post_bahn_sicher</data>
+            <data name="post_hammer">post_hammer</data>
+            <data name="post_hammer_sicher">post_hammer_sicher</data>
+            <data name="post_kreis">post_kreis</data>
+            <data name="post_schleuder">post_schleuder</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=loslassen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_bahn" type="buffer" keep="true">pre_bahn</send>
+            <send id="pre_bahn_sicher" type="buffer" keep="true">pre_bahn_sicher</send>
+            <send id="pre_hammer" type="buffer" keep="true">pre_hammer</send>
+            <send id="pre_hammer_sicher" type="buffer" keep="true">pre_hammer_sicher</send>
+            <send id="pre_kreis" type="buffer" keep="true">pre_kreis</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=loslassen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="a_max" type="buffer" keep="true">a_max</send>
+            <send id="dt_los" type="buffer" keep="true">dt_los</send>
+            <send id="dt_s" type="buffer" keep="true">dt_s</send>
+            <send id="post_bahn" type="buffer" keep="true">post_bahn</send>
+            <send id="post_bahn_sicher" type="buffer" keep="true">post_bahn_sicher</send>
+            <send id="post_hammer" type="buffer" keep="true">post_hammer</send>
+            <send id="post_hammer_sicher" type="buffer" keep="true">post_hammer_sicher</send>
+            <send id="post_kreis" type="buffer" keep="true">post_kreis</send>
+            <send id="post_schleuder" type="buffer" keep="true">post_schleuder</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Laut gleich hoch?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem Mikrofon des Smartphones (Frequenz und Lautstärke eines Tons) und Nachtest zur Vorstellung „Laute Töne sind hohe Töne“. Kein phyphox:mini nötig.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="4800">rec</container>
+        <container size="1" init="48000">rate</container>
+        <container size="4800">rec_t</container>
+        <container size="0">ac_y</container>
+        <container size="0">ac_x</container>
+        <container size="1" init="0.025" static="true">ac_maxX</container>
+        <container size="1">t_neg</container>
+        <container size="0">acf_x</container>
+        <container size="0">acf_y</container>
+        <container size="1">ac_peak</container>
+        <container size="1">period</container>
+        <container size="1">ac0</container>
+        <container size="1">quality</container>
+        <container size="1">f_now</container>
+        <container size="1">f_vis</container>
+        <container size="4800">rec_sq</container>
+        <container size="1">ms</container>
+        <container size="1">L_now</container>
+        <container size="0">osc_t</container>
+        <container size="0">osc_y</container>
+        <container size="1">timer_t</container>
+        <container size="0">t_hist</container>
+        <container size="0">f_hist</container>
+        <container size="0">L_hist</container>
+        <container size="1">f_good</container>
+        <container size="1">f_leise</container>
+        <container size="1">L_leise</container>
+        <container size="1">f_laut</container>
+        <container size="1">L_laut</container>
+        <container size="1">f_anders</container>
+        <container size="1">L_anders</container>
+        <container size="1">df_laut</container>
+        <container size="1">dL_laut</container>
+        <container size="1">df_anders</container>
+        <container size="1">rec_t_stop</container>
+        <container size="1">f_vis_neg</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_gitarre</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_gitarre_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_tuba</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_tuba_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_laut</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_gitarre</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_gitarre_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_tuba</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_tuba_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_laut</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_radio</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <audio rate="48000">
+            <output component="out">rec</output>
+            <output component="rate">rate</output>
+        </audio>
+    </input>
+
+    <analysis sleep="0.1">
+        <formula formula="4799/[1]">
+            <input keep="true">rate</input>
+            <output>rec_t_stop</output>
+        </formula>
+        <ramp>
+            <input as="start" type="value">0</input>
+            <input as="stop" keep="true">rec_t_stop</input>
+            <input as="length" type="value">4800</input>
+            <output as="out">rec_t</output>
+        </ramp>
+        <autocorrelation>
+            <input as="x" keep="true">rec_t</input>
+            <input as="y" keep="true">rec</input>
+            <input as="minX" type="value">0</input>
+            <input as="maxX" keep="true">ac_maxX</input>
+            <output as="y">ac_y</output>
+            <output as="x">ac_x</output>
+        </autocorrelation>
+        <first>
+            <input as="value" keep="true">ac_y</input>
+            <output as="first">ac0</output>
+        </first>
+        <threshold falling="true">
+            <input as="x" keep="true">ac_x</input>
+            <input as="y" keep="true">ac_y</input>
+            <input as="threshold" type="value">0</input>
+            <output as="position">t_neg</output>
+        </threshold>
+        <rangefilter>
+            <input keep="true">ac_x</input>
+            <input as="min" keep="true">t_neg</input>
+            <input keep="true">ac_y</input>
+            <output>acf_x</output>
+            <output>acf_y</output>
+        </rangefilter>
+        <max>
+            <input as="x" keep="true">acf_x</input>
+            <input as="y" keep="true">acf_y</input>
+            <output as="max">ac_peak</output>
+            <output as="position">period</output>
+        </max>
+        <formula formula="1/[1]">
+            <input keep="true">period</input>
+            <output>f_now</output>
+        </formula>
+        <formula formula="[1]/[2]">
+            <input keep="true">ac_peak</input>
+            <input keep="true">ac0</input>
+            <output>quality</output>
+        </formula>
+        <formula formula="[1]-0.6">
+            <input keep="true">quality</input>
+            <output>f_vis</output>
+        </formula>
+        <formula formula="[1_]^2">
+            <input keep="true">rec</input>
+            <output>rec_sq</output>
+        </formula>
+        <average>
+            <input as="buffer" keep="true">rec_sq</input>
+            <output as="average">ms</output>
+        </average>
+        <formula formula="4.3429*log([1])">
+            <input keep="true">ms</input>
+            <output>L_now</output>
+        </formula>
+        <subrange>
+            <input as="from" type="value">0</input>
+            <input as="length" type="value">480</input>
+            <input keep="true">rec</input>
+            <output>osc_y</output>
+        </subrange>
+        <timer>
+            <output as="out">timer_t</output>
+        </timer>
+        <if greater="true">
+            <input as="a" keep="true">quality</input>
+            <input as="b" type="value">0.6</input>
+            <input as="true" keep="true">f_now</input>
+            <input as="false" type="value">NaN</input>
+            <output as="result">f_good</output>
+        </if>
+        <append>
+            <input keep="true">timer_t</input>
+            <output append="true">t_hist</output>
+        </append>
+        <append>
+            <input keep="true">f_good</input>
+            <output append="true">f_hist</output>
+        </append>
+        <append>
+            <input keep="true">L_now</input>
+            <output append="true">L_hist</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">f_laut</input>
+            <input keep="true">f_leise</input>
+            <output>df_laut</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">L_laut</input>
+            <input keep="true">L_leise</input>
+            <output>dL_laut</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">f_anders</input>
+            <input keep="true">f_leise</input>
+            <output>df_anders</output>
+        </formula>
+        <formula formula="-[1]">
+            <input keep="true">f_vis</input>
+            <output>f_vis_neg</output>
+        </formula>
+        <subrange>
+            <input as="from" type="value">0</input>
+            <input as="length" type="value">480</input>
+            <input keep="true">rec_t</input>
+            <output>osc_t</output>
+        </subrange>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_gitarre</input>
+            <input keep="true">pre_gitarre_sicher</input>
+            <input keep="true">pre_tuba</input>
+            <input keep="true">pre_tuba_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_gitarre</input>
+            <input keep="true">post_gitarre_sicher</input>
+            <input keep="true">post_tuba</input>
+            <input keep="true">post_tuba_sicher</input>
+            <input keep="true">post_radio</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Laut gleich hoch? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Tonhöhe (Frequenz) und Lautstärke (Amplitude) werden getrennt gemessen: Derselbe Ton laut und leise hat dieselbe Frequenz, ein anderer Ton bei gleicher Lautstärke eine andere. Das Schwingungsbild mit fester Achse zeigt den Unterschied direkt: größerer Ausschlag vs. engere Wellenberge." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="Tonhöhe und Lautstärke werden nicht getrennt; laute Töne gelten auch als hohe Töne (Schecker u. a. 2018, S. 253)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Die Frequenz bestimmt die Tonhöhe, die Amplitude die Lautstärke. Beim stärkeren Anschlagen einer Saite ändert sich die Frequenz praktisch nicht (minimal durch größere Spannung). Beim Anblasen einer Flasche kann zu kräftiges Blasen in einen Oberton springen – dann bewusst besprechen." />
+            <separator height="2" />
+            <info label="Auswertung" bold="true" />
+            <info label="Die Frequenz wird wie im phyphox-Experiment „Audio-Autokorrelation“ bestimmt: erstes Maximum der Autokorrelation nach dem ersten Nulldurchgang (Bereich bis 25 ms, also ab 40 Hz). Sie wird nur angezeigt, wenn das Maximum mindestens 60 % des Nullwerts erreicht (sauberer Ton). Die Lautstärke ist der Effektivwert in dB relativ zum Vollausschlag des Mikrofons (nicht kalibriert, nur Unterschiede aussagekräftig)." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Kein phyphox:mini nötig, eher für Grundschule und Unterstufe. Leise Umgebung wählen. Sehr laute Töne können das Mikrofon übersteuern (flache Wellenberge im Schwingungsbild)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Du schlägst dieselbe Gitarrensaite stärker an. Der Ton wird …" italic="true" size="0.85" />
+            <info label="1 = lauter und höher → laut = hoch
+            2 = nur lauter → richtig
+            3 = nur höher → laut = hoch" size="0.85" />
+            <info label="2. Kann ein tiefer Ton (zum Beispiel von einer Tuba) lauter sein als ein hoher Ton (zum Beispiel von einer Flöte)?" italic="true" size="0.85" />
+            <info label="1 = nein, tiefe Töne sind immer leiser → laut = hoch
+            2 = ja → richtig
+            3 = nur, wenn man sehr nah dran ist → unklare Vorstellung" size="0.85" />
+            <info label="3. Laute Töne sind hohe Töne." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Du drehst das Radio lauter. Die Töne des Liedes werden …" italic="true" size="0.85" />
+            <info label="1 = höher → laut = hoch
+            2 = nicht höher oder tiefer, nur lauter → richtig
+            3 = tiefer → unklare Vorstellung" size="0.85" />
+            <info label="5 (nur Nachtest). Was änderte sich an der Schwingung, als du den Ton lauter gemacht hast?" italic="true" size="0.85" />
+            <info label="1 = Die Frequenz stieg. → laut = hoch
+            2 = Nur die Amplitude (der Ausschlag) wurde größer. → richtig
+            3 = Frequenz und Amplitude stiegen beide. → laut = hoch" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = sie steigt → laut = hoch" size="0.85" />
+            <info label="2 = sie bleibt gleich → ERWARTET" size="0.85" />
+            <info label="3 = sie sinkt → unklare Vorstellung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Laut gleich hoch? – Vortest" bold="true" size="1.2" />
+            <info label="Tippe oben rechts auf ▶, damit das Mikrofon misst, und beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Du schlägst dieselbe Gitarrensaite stärker an. Der Ton wird …" bold="true" />
+            <dropdown default="0">
+                <output>pre_gitarre</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">lauter und höher</map>
+                <map value="2">nur lauter</map>
+                <map value="3">nur höher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_gitarre_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Kann ein tiefer Ton (zum Beispiel von einer Tuba) lauter sein als ein hoher Ton (zum Beispiel von einer Flöte)?" bold="true" />
+            <dropdown default="0">
+                <output>pre_tuba</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nein, tiefe Töne sind immer leiser</map>
+                <map value="2">ja</map>
+                <map value="3">nur, wenn man sehr nah dran ist</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_tuba_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Laute Töne sind hohe Töne." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_laut</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_laut">
+                <input>pre_laut</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Laut gleich hoch? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst eine Tonquelle mit gleichbleibendem Ton: Stimmgabel, eine angeblasene Flasche, ein Instrument oder einen Tongenerator auf einem zweiten Gerät (z. B. phyphox „Tongenerator“). Halte das Smartphone ruhig, etwa 30 cm entfernt." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Du erzeugst denselben Ton erst leise und dann laut. Was passiert mit der Frequenz?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sie steigt</map>
+                <map value="2">sie bleibt gleich</map>
+                <map value="3">sie sinkt</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Schwingung (10 ms Ausschnitt)" labelX="Zeit" unitX="s" labelY="Ausschlag" unitY="" partialUpdate="false" scaleMinY="fixed" scaleMaxY="fixed" minY="-1" maxY="1">
+                <input axis="x">osc_t</input>
+                <input axis="y">osc_y</input>
+            </graph>
+            <value label="Frequenz" precision="0" unit="Hz" size="1.8" visibility="f_vis">
+                <input>f_now</input>
+            </value>
+            <info label="Kein gleichmäßiger Ton erkannt" italic="true" visibility="f_vis_neg" />
+            <value visibility="vorhersage" label="Lautstärke (relativ)" precision="1" unit="dB">
+                <input>L_now</input>
+            </value>
+            <graph visibility="vorhersage" label="Frequenz über die Zeit" labelX="Zeit" unitX="s" labelY="Frequenz" unitY="Hz" style="dots" partialUpdate="true">
+                <input axis="x">t_hist</input>
+                <input axis="y">f_hist</input>
+            </graph>
+            <graph visibility="vorhersage" label="Lautstärke über die Zeit" labelX="Zeit" unitX="s" labelY="Lautstärke" unitY="dB" partialUpdate="true">
+                <input axis="x">t_hist</input>
+                <input axis="y">L_hist</input>
+            </graph>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Leise" bold="true" />
+            <info visibility="vorhersage" label="Erzeuge den Ton leise und halte ihn gleichmäßig. Tippe:" />
+            <button visibility="vorhersage" label="Leisen Ton festhalten">
+                <input type="buffer">f_now</input>
+                <output>f_leise</output>
+                <input type="buffer">L_now</input>
+                <output>L_leise</output>
+            </button>
+            <value visibility="vorhersage" label="Leise: Frequenz" precision="0" unit="Hz">
+                <input>f_leise</input>
+            </value>
+            <value visibility="vorhersage" label="Leise: Lautstärke" precision="1" unit="dB">
+                <input>L_leise</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Laut" bold="true" />
+            <info visibility="vorhersage" label="Erzeuge denselben Ton jetzt laut (stärker anschlagen, kräftiger blasen, Lautstärke hochdrehen). Tippe:" />
+            <button visibility="vorhersage" label="Lauten Ton festhalten">
+                <input type="buffer">f_now</input>
+                <output>f_laut</output>
+                <input type="buffer">L_now</input>
+                <output>L_laut</output>
+            </button>
+            <value visibility="vorhersage" label="Laut: Frequenz" precision="0" unit="Hz">
+                <input>f_laut</input>
+            </value>
+            <value visibility="vorhersage" label="Laut: Lautstärke" precision="1" unit="dB">
+                <input>L_laut</input>
+            </value>
+            <value visibility="vorhersage" label="Änderung der Frequenz" precision="0" unit="Hz" size="1.3">
+                <input>df_laut</input>
+            </value>
+            <value visibility="vorhersage" label="Änderung der Lautstärke" precision="1" unit="dB" size="1.3">
+                <input>dL_laut</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Anderer Ton, gleich laut" bold="true" />
+            <info visibility="vorhersage" label="Erzeuge einen höheren oder tieferen Ton ungefähr so laut wie eben. Tippe:" />
+            <button visibility="vorhersage" label="Anderen Ton festhalten">
+                <input type="buffer">f_now</input>
+                <output>f_anders</output>
+                <input type="buffer">L_now</input>
+                <output>L_anders</output>
+            </button>
+            <value visibility="vorhersage" label="Anderer Ton: Frequenz" precision="0" unit="Hz">
+                <input>f_anders</input>
+            </value>
+            <value visibility="vorhersage" label="Änderung der Frequenz gegenüber leise" precision="0" unit="Hz">
+                <input>df_anders</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Was hat sich beim lauten Ton geändert, was beim anderen Ton? Schau dir dazu auch die Schwingung oben an: Ausschlag oder Abstand der Wellenberge? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Laut gleich hoch? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Du schlägst dieselbe Gitarrensaite stärker an. Der Ton wird …" bold="true" />
+            <dropdown default="0">
+                <output>post_gitarre</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">lauter und höher</map>
+                <map value="2">nur lauter</map>
+                <map value="3">nur höher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_gitarre_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Kann ein tiefer Ton (zum Beispiel von einer Tuba) lauter sein als ein hoher Ton (zum Beispiel von einer Flöte)?" bold="true" />
+            <dropdown default="0">
+                <output>post_tuba</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nein, tiefe Töne sind immer leiser</map>
+                <map value="2">ja</map>
+                <map value="3">nur, wenn man sehr nah dran ist</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_tuba_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Laute Töne sind hohe Töne." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_laut</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_laut">
+                <input>post_laut</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Du drehst das Radio lauter. Die Töne des Liedes werden …" bold="true" />
+            <dropdown default="0">
+                <output>post_radio</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">höher</map>
+                <map value="2">nicht höher oder tiefer, nur lauter</map>
+                <map value="3">tiefer</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Was änderte sich an der Schwingung, als du den Ton lauter gemacht hast?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Die Frequenz stieg.</map>
+                <map value="2">Nur die Amplitude (der Ausschlag) wurde größer.</map>
+                <map value="3">Frequenz und Amplitude stiegen beide.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Verlauf">
+            <data name="Zeit (s)">t_hist</data>
+            <data name="Frequenz (Hz)">f_hist</data>
+            <data name="Lautstärke (dB)">L_hist</data>
+        </set>
+        <set name="Marker">
+            <data name="f leise (Hz)">f_leise</data>
+            <data name="L leise (dB)">L_leise</data>
+            <data name="f laut (Hz)">f_laut</data>
+            <data name="L laut (dB)">L_laut</data>
+            <data name="f anders (Hz)">f_anders</data>
+            <data name="L anders (dB)">L_anders</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Frequenz leise (Hz)">f_leise</data>
+            <data name="Frequenz laut (Hz)">f_laut</data>
+            <data name="Lautstärkeänderung (dB)">dL_laut</data>
+            <data name="Frequenz anderer Ton (Hz)">f_anders</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_gitarre">pre_gitarre</data>
+            <data name="pre_gitarre_sicher">pre_gitarre_sicher</data>
+            <data name="pre_tuba">pre_tuba</data>
+            <data name="pre_tuba_sicher">pre_tuba_sicher</data>
+            <data name="pre_laut">pre_laut</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_gitarre">post_gitarre</data>
+            <data name="post_gitarre_sicher">post_gitarre_sicher</data>
+            <data name="post_tuba">post_tuba</data>
+            <data name="post_tuba_sicher">post_tuba_sicher</data>
+            <data name="post_laut">post_laut</data>
+            <data name="post_radio">post_radio</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=laut_hoch" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_gitarre" type="buffer" keep="true">pre_gitarre</send>
+            <send id="pre_gitarre_sicher" type="buffer" keep="true">pre_gitarre_sicher</send>
+            <send id="pre_tuba" type="buffer" keep="true">pre_tuba</send>
+            <send id="pre_tuba_sicher" type="buffer" keep="true">pre_tuba_sicher</send>
+            <send id="pre_laut" type="buffer" keep="true">pre_laut</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=laut_hoch" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="f_leise" type="buffer" keep="true">f_leise</send>
+            <send id="f_laut" type="buffer" keep="true">f_laut</send>
+            <send id="dL_laut" type="buffer" keep="true">dL_laut</send>
+            <send id="f_anders" type="buffer" keep="true">f_anders</send>
+            <send id="post_gitarre" type="buffer" keep="true">post_gitarre</send>
+            <send id="post_gitarre_sicher" type="buffer" keep="true">post_gitarre_sicher</send>
+            <send id="post_tuba" type="buffer" keep="true">post_tuba</send>
+            <send id="post_tuba_sicher" type="buffer" keep="true">post_tuba_sicher</send>
+            <send id="post_laut" type="buffer" keep="true">post_laut</send>
+            <send id="post_radio" type="buffer" keep="true">post_radio</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

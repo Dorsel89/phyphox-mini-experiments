@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Macht der Ventilator die Luft kälter?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Temperatur im Luftstrom eines Ventilators, trocken und mit feuchtem Tuch) und Nachtest zur Vorstellung „Wind kühlt die Luft“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t</container>
+        <container size="0">temp</container>
+        <container size="0">hum</container>
+        <container size="1">t_now</container>
+        <container size="1">T_now</container>
+        <container size="1">H_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1">T_a</container>
+        <container size="1">T_b</container>
+        <container size="1">T_c</container>
+        <container size="1">T_d</container>
+        <container size="1">H_c</container>
+        <container size="1">H_d</container>
+        <container size="1">dT_trocken</container>
+        <container size="1">dT_feucht</container>
+        <container size="1">dH_feucht</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_zimmer</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_zimmer_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_nass</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_nass_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_bewegt</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_zimmer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_zimmer_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_nass</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_nass_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_bewegt</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_thermometer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" subscribeOnStart="true">
+            <!-- HDC1080 an, Messintervall 10 x 100 ms -->
+            <config char="cddf1006-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010A</config>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0">temp</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">hum</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">t</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">temp</input>
+            <output>T_now</output>
+        </append>
+        <append>
+            <input keep="true">hum</input>
+            <output>H_now</output>
+        </append>
+        <append>
+            <input keep="true">t</input>
+            <output>t_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">T_b</input>
+            <input keep="true">T_a</input>
+            <output>dT_trocken</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">T_d</input>
+            <input keep="true">T_c</input>
+            <output>dT_feucht</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">H_d</input>
+            <input keep="true">H_c</input>
+            <output>dH_feucht</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_zimmer</input>
+            <input keep="true">pre_zimmer_sicher</input>
+            <input keep="true">pre_nass</input>
+            <input keep="true">pre_nass_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_zimmer</input>
+            <input keep="true">post_zimmer_sicher</input>
+            <input keep="true">post_nass</input>
+            <input keep="true">post_nass_sicher</input>
+            <input keep="true">post_thermometer</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Macht der Ventilator die Luft kälter? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden prüfen die Alltagsvorstellung „Ein Ventilator oder Wind macht die Luft kälter“. Im trockenen Luftstrom bleibt die Temperatur gleich, mit feuchtem Tuch sinkt sie deutlich. So wird die Ersatzvorstellung aufgebaut: Kühl fühlt sich Wind an, weil er die Verdunstung (und den Wärmeabtransport) an der Haut beschleunigt – die Luft selbst wird nicht kälter." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Bewegte Luft ist kälter als ruhende Luft.“ Alltagsvorstellung, im Buch nicht eigens aufgeführt (eigene Ergänzung im Konzeptpapier)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Ein Ventilator bewegt die Luft, er entzieht ihr keine Energie. Sein Motor und die Luftreibung geben sogar etwas Wärme ab. Der Sensor hat (anders als die Haut) keine eigene Wärmequelle und ist trocken – er zeigt deshalb im Luftstrom die Lufttemperatur. Mit feuchtem Tuch verdunstet Wasser; die Verdampfungsenthalpie (rund 2,4 kJ pro Gramm) wird der Umgebung des Sensors entzogen. Der Sensor wirkt dann wie ein Feuchtthermometer (Psychrometer)." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Trocken: Änderung kleiner als etwa 0,3 K. Mit feuchtem Tuch: mehrere Kelvin Abkühlung, die relative Feuchte steigt deutlich." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Der Ventilator darf nicht von einer Heizung oder aus der Sonne warme Luft ansaugen. Tuch nur feucht, nicht tropfnass; das Silikongehäuse geschlossen lassen. Nach dem Versuch mini trocknen lassen. Bei warmer Hand vor dem Ablegen kurz warten, damit der Sensor nicht von der Hand erwärmt startet." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Ventilator läuft eine Stunde lang in einem geschlossenen Zimmer. Die Lufttemperatur im Zimmer ist danach …" italic="true" size="0.85" />
+            <info label="1 = niedriger als vorher → Wind/Ventilator kühlt die Luft
+            2 = gleich oder minimal höher → richtig
+            3 = deutlich höher → Motorwärme überschätzt" size="0.85" />
+            <info label="2. Warum fühlt sich Wind auf nasser Haut kalt an?" italic="true" size="0.85" />
+            <info label="1 = Der Wind ist kälter als ruhende Luft. → bewegte Luft ist kälter
+            2 = Das Wasser verdunstet und entzieht der Haut dabei Energie. → richtig
+            3 = Der Wind bläst die Körperwärme weg. → teilweise richtig (Konvektion), erklärt nicht den Unterschied nass/trocken" size="0.85" />
+            <info label="3. Bewegte Luft ist kälter als ruhende Luft." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Thermometer hängt bei Windstille im Schatten. Dann kommt trockener Wind auf. Das Thermometer zeigt …" italic="true" size="0.85" />
+            <info label="1 = weniger an → Wind kühlt
+            2 = etwa dasselbe an → richtig
+            3 = mehr an → Reibung erwärmt" size="0.85" />
+            <info label="5 (nur Nachtest). Warum sank die Temperatur, als das feuchte Tuch im Luftstrom war?" italic="true" size="0.85" />
+            <info label="1 = Das Tuch war kälter als die Luft. → Ausweicherklärung
+            2 = Wasser verdunstete und nahm dabei Energie auf. → richtig
+            3 = Mit Tuch bläst der Ventilator stärker. → bewegte Luft ist kälter" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = sie sinkt deutlich → Wind kühlt die Luft" size="0.85" />
+            <info label="2 = sie bleibt etwa gleich → ERWARTET" size="0.85" />
+            <info label="3 = sie steigt → Reibung/Motor" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Macht der Ventilator die Luft kälter? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Ventilator läuft eine Stunde lang in einem geschlossenen Zimmer. Die Lufttemperatur im Zimmer ist danach …" bold="true" />
+            <dropdown default="0">
+                <output>pre_zimmer</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">niedriger als vorher</map>
+                <map value="2">gleich oder minimal höher</map>
+                <map value="3">deutlich höher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_zimmer_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Warum fühlt sich Wind auf nasser Haut kalt an?" bold="true" />
+            <dropdown default="0">
+                <output>pre_nass</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Der Wind ist kälter als ruhende Luft.</map>
+                <map value="2">Das Wasser verdunstet und entzieht der Haut dabei Energie.</map>
+                <map value="3">Der Wind bläst die Körperwärme weg.</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_nass_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Bewegte Luft ist kälter als ruhende Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_bewegt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_bewegt">
+                <input>pre_bewegt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Macht der Ventilator die Luft kälter? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst einen Ventilator (oder eine Pappe zum Fächeln) und ein feuchtes, nicht tropfnasses Tuch. Der mini liegt die ganze Zeit an derselben Stelle." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Der mini kommt gleich 2 Minuten in den Luftstrom des Ventilators. Was passiert mit der Temperatur, die er misst?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sie sinkt deutlich</map>
+                <map value="2">sie bleibt etwa gleich</map>
+                <map value="3">sie steigt</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Temperatur" labelX="Zeit" unitX="s" labelY="Temperatur" unitY="°C" scaleMinY="fixed" scaleMaxY="fixed" minY="10" maxY="30" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">temp</input>
+            </graph>
+            <graph visibility="vorhersage" label="Relative Luftfeuchtigkeit" labelX="Zeit" unitX="s" labelY="rel. Feuchte" unitY="%" scaleMinY="fixed" scaleMaxY="fixed" minY="0" maxY="100" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">hum</input>
+            </graph>
+            <value visibility="vorhersage" label="Temperatur jetzt" precision="2" unit="°C">
+                <input>T_now</input>
+            </value>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Trockener Luftstrom" bold="true" />
+            <info visibility="vorhersage" label="Lass den mini zuerst 2 Minuten ruhig liegen. Schalte dann den Ventilator ein (oder fächle gleichmäßig) und tippe sofort:" />
+            <button visibility="vorhersage" label="Ventilator ist an">
+                <input type="buffer">T_now</input>
+                <output>T_a</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <info visibility="vorhersage" label="Warte 2 Minuten (120 s) im Luftstrom und tippe dann:" />
+            <button visibility="vorhersage" label="2 Minuten Luftstrom sind um">
+                <input type="buffer">T_now</input>
+                <output>T_b</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Temperaturänderung im trockenen Luftstrom" precision="2" unit="K">
+                <input>dT_trocken</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Luftstrom mit feuchtem Tuch" bold="true" />
+            <info visibility="vorhersage" label="Lege das feuchte Tuch locker über den mini (Gehäuse geschlossen lassen, nicht tropfnass!) und lass den Ventilator weiterlaufen. Tippe dabei:" />
+            <button visibility="vorhersage" label="Feuchtes Tuch liegt auf dem mini">
+                <input type="buffer">T_now</input>
+                <output>T_c</output>
+                <input type="buffer">H_now</input>
+                <output>H_c</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <info visibility="vorhersage" label="Warte wieder 2 Minuten und tippe dann:" />
+            <button visibility="vorhersage" label="2 Minuten mit Tuch sind um">
+                <input type="buffer">T_now</input>
+                <output>T_d</output>
+                <input type="buffer">H_now</input>
+                <output>H_d</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Temperaturänderung mit feuchtem Tuch" precision="2" unit="K">
+                <input>dT_feucht</input>
+            </value>
+            <value visibility="vorhersage" label="Änderung der Luftfeuchtigkeit" precision="2" unit="%">
+                <input>dH_feucht</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Vergleiche beide Änderungen mit deiner Vorhersage. Was ist beim Tuch anders als beim trockenen Luftstrom? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Macht der Ventilator die Luft kälter? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Ventilator läuft eine Stunde lang in einem geschlossenen Zimmer. Die Lufttemperatur im Zimmer ist danach …" bold="true" />
+            <dropdown default="0">
+                <output>post_zimmer</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">niedriger als vorher</map>
+                <map value="2">gleich oder minimal höher</map>
+                <map value="3">deutlich höher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_zimmer_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Warum fühlt sich Wind auf nasser Haut kalt an?" bold="true" />
+            <dropdown default="0">
+                <output>post_nass</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Der Wind ist kälter als ruhende Luft.</map>
+                <map value="2">Das Wasser verdunstet und entzieht der Haut dabei Energie.</map>
+                <map value="3">Der Wind bläst die Körperwärme weg.</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_nass_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Bewegte Luft ist kälter als ruhende Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_bewegt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_bewegt">
+                <input>post_bewegt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Thermometer hängt bei Windstille im Schatten. Dann kommt trockener Wind auf. Das Thermometer zeigt …" bold="true" />
+            <dropdown default="0">
+                <output>post_thermometer</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">weniger an</map>
+                <map value="2">etwa dasselbe an</map>
+                <map value="3">mehr an</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum sank die Temperatur, als das feuchte Tuch im Luftstrom war?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Das Tuch war kälter als die Luft.</map>
+                <map value="2">Wasser verdunstete und nahm dabei Energie auf.</map>
+                <map value="3">Mit Tuch bläst der Ventilator stärker.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">t</data>
+            <data name="Temperatur (°C)">temp</data>
+            <data name="Relative Feuchte (%)">hum</data>
+        </set>
+        <set name="Marker">
+            <data name="T Ventilator an (°C)">T_a</data>
+            <data name="T nach 2 min trocken (°C)">T_b</data>
+            <data name="T Tuch aufgelegt (°C)">T_c</data>
+            <data name="T nach 2 min Tuch (°C)">T_d</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Temperaturänderung trocken (K)">dT_trocken</data>
+            <data name="Temperaturänderung feucht (K)">dT_feucht</data>
+            <data name="Feuchteänderung mit Tuch (%)">dH_feucht</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_zimmer">pre_zimmer</data>
+            <data name="pre_zimmer_sicher">pre_zimmer_sicher</data>
+            <data name="pre_nass">pre_nass</data>
+            <data name="pre_nass_sicher">pre_nass_sicher</data>
+            <data name="pre_bewegt">pre_bewegt</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_zimmer">post_zimmer</data>
+            <data name="post_zimmer_sicher">post_zimmer_sicher</data>
+            <data name="post_nass">post_nass</data>
+            <data name="post_nass_sicher">post_nass_sicher</data>
+            <data name="post_bewegt">post_bewegt</data>
+            <data name="post_thermometer">post_thermometer</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=ventilator" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_zimmer" type="buffer" keep="true">pre_zimmer</send>
+            <send id="pre_zimmer_sicher" type="buffer" keep="true">pre_zimmer_sicher</send>
+            <send id="pre_nass" type="buffer" keep="true">pre_nass</send>
+            <send id="pre_nass_sicher" type="buffer" keep="true">pre_nass_sicher</send>
+            <send id="pre_bewegt" type="buffer" keep="true">pre_bewegt</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=ventilator" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="dT_trocken" type="buffer" keep="true">dT_trocken</send>
+            <send id="dT_feucht" type="buffer" keep="true">dT_feucht</send>
+            <send id="dH_feucht" type="buffer" keep="true">dH_feucht</send>
+            <send id="post_zimmer" type="buffer" keep="true">post_zimmer</send>
+            <send id="post_zimmer_sicher" type="buffer" keep="true">post_zimmer_sicher</send>
+            <send id="post_nass" type="buffer" keep="true">post_nass</send>
+            <send id="post_nass_sicher" type="buffer" keep="true">post_nass_sicher</send>
+            <send id="post_bewegt" type="buffer" keep="true">post_bewegt</send>
+            <send id="post_thermometer" type="buffer" keep="true">post_thermometer</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

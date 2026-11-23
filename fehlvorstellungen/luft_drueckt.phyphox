@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Drückt ruhende Luft?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Luftdruck in verschiedenen Lagen und in einem zusammengedrückten Beutel) und Nachtest zur Vorstellung „Unbewegte Luft drückt nicht“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">p_raw</container>
+        <container size="0">Tb_raw</container>
+        <container size="0">tp_raw</container>
+        <container size="0">p</container>
+        <container size="0">Tb</container>
+        <container size="0">tp</container>
+        <container size="40">p_win</container>
+        <container size="40">Tb_win</container>
+        <container size="1">p_avg</container>
+        <container size="1">Tb_avg</container>
+        <container size="1">p_now</container>
+        <container size="1">tp_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="1">p_first</container>
+        <container size="0">p_rel</container>
+        <container size="120">p_win10</container>
+        <container size="1">p_max10</container>
+        <container size="1">p_min10</container>
+        <container size="1">dp10</container>
+        <container size="26">az_win</container>
+        <container size="26">a_win</container>
+        <container size="1">az_avg</container>
+        <container size="1">a_avg</container>
+        <container size="1">lage</container>
+        <container size="1">dp_drehen</container>
+        <container size="1">p_ref_b</container>
+        <container size="1">dp_beutel_now</container>
+        <container size="1">dp_beutel</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_papier</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_papier_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_strohhalm</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_strohhalm_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_bewegt</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_papier</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_papier_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_strohhalm</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_strohhalm_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_bewegt</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_karton</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- BMP581 an, Oversampling-Code 5 (5 = 32x), IIR-Code 1 -->
+            <config char="cddf1008-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010501</config>
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 26 Hz, Bereich-Code 1, Drehraten-Code 0, float, 5 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010201000005</config>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="12">p_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="12">Tb_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="12">tp_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">p_raw</input>
+            <output append="true">p_win</output>
+        </append>
+        <append>
+            <input keep="true">Tb_raw</input>
+            <output append="true">Tb_win</output>
+        </append>
+        <append>
+            <input keep="false">p_raw</input>
+            <output append="true">p</output>
+        </append>
+        <append>
+            <input keep="false">Tb_raw</input>
+            <output append="true">Tb</output>
+        </append>
+        <append>
+            <input keep="false">tp_raw</input>
+            <output append="true">tp</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">p_win</input>
+            <output as="average">p_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">Tb_win</input>
+            <output as="average">Tb_avg</output>
+        </average>
+        <append>
+            <input keep="true">p</input>
+            <output>p_now</output>
+        </append>
+        <append>
+            <input keep="true">tp</input>
+            <output>tp_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">tp_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <append>
+            <input keep="true">p_raw</input>
+            <output append="true">p_win10</output>
+        </append>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_win</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <append>
+            <input keep="true">az</input>
+            <output>az_win</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">az_win</input>
+            <output as="average">az_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">a_win</input>
+            <output as="average">a_avg</output>
+        </average>
+        <formula formula="[1]/[2]">
+            <input keep="true">az_avg</input>
+            <input keep="true">a_avg</input>
+            <output>lage</output>
+        </formula>
+        <first>
+            <input as="value" keep="true">p</input>
+            <output as="first">p_first</output>
+        </first>
+        <formula formula="[2_]-[1]">
+            <input keep="true">p_first</input>
+            <input keep="true">p</input>
+            <output>p_rel</output>
+        </formula>
+        <max>
+            <input as="y" keep="true">p_win10</input>
+            <output as="max">p_max10</output>
+        </max>
+        <min>
+            <input as="y" keep="true">p_win10</input>
+            <output as="min">p_min10</output>
+        </min>
+        <formula formula="[1]-[2]">
+            <input keep="true">p_max10</input>
+            <input keep="true">p_min10</input>
+            <output>dp10</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">p_avg</input>
+            <input keep="true">p_ref_b</input>
+            <output>dp_beutel_now</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_papier</input>
+            <input keep="true">pre_papier_sicher</input>
+            <input keep="true">pre_strohhalm</input>
+            <input keep="true">pre_strohhalm_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_papier</input>
+            <input keep="true">post_papier_sicher</input>
+            <input keep="true">post_strohhalm</input>
+            <input keep="true">post_strohhalm_sicher</input>
+            <input keep="true">post_karton</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Drückt ruhende Luft? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden prüfen, ob der Luftdruck von der Richtung abhängt und ob ruhende Luft überhaupt drückt. Beim Drehen bleibt der Druck gleich (allseitig), im zusammengedrückten Beutel steigt er, obwohl die Luft nicht strömt. Ersatzvorstellung: Luft drückt immer und von allen Seiten; „Saugen“ heißt, dass außen mehr Druck herrscht als innen." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Luft drückt nach vorne, Vakuum saugt“; unbewegte Luft „tut nichts“, Luftdruck wirkt nicht allseitig (Schecker u. a. 2018, S. 250)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Der Druck in einem ruhenden Gas ist in einem Punkt in alle Richtungen gleich (Pascal). Beim Drehen ändert sich nur die Höhe um wenige Zentimeter, also weniger als 0,01 hPa. Im Beutel wird das Volumen verkleinert: p·V = konstant, wenige Prozent Volumenänderung ergeben einige zehn hPa." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Drehen: Unterschied unter etwa 0,05 hPa (Sensorrauschen). Beutel: deutlicher Anstieg, je nach Kraft 5 bis über 50 hPa." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Wenig überraschend, eher für jüngere Lernende. Die Strohhalm-Frage wird nur indirekt gestützt. Die Lageanzeige nutzt die z-Achse des Beschleunigungssensors; welche Seite des mini als „Oberseite“ gilt, vor dem Einsatz prüfen und ggf. in der Anleitung benennen. Beim Halten keine warme Hand um den Sensor legen (Temperaturdrift)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Blatt Papier liegt auf dem Tisch. Die Luft drückt auf das Papier …" italic="true" size="0.85" />
+            <info label="1 = nur von oben → Luftdruck wirkt nur nach unten
+            2 = von allen Seiten gleich stark → richtig
+            3 = gar nicht, weil sie sich nicht bewegt → ruhende Luft tut nichts" size="0.85" />
+            <info label="2. Beim Trinken mit dem Strohhalm steigt der Saft nach oben, weil …" italic="true" size="0.85" />
+            <info label="1 = man ihn hochsaugt → Vakuum saugt
+            2 = die Luft außen auf den Saft drückt und ihn hochschiebt → richtig" size="0.85" />
+            <info label="3. Luft kann nur dann drücken, wenn sie sich bewegt." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Du saugst die Luft aus einem leeren Getränkekarton und er knickt zusammen. Warum?" italic="true" size="0.85" />
+            <info label="1 = Das Saugen zieht die Wände nach innen. → Vakuum saugt
+            2 = Die Luft außen drückt stärker als die wenige Luft innen. → richtig
+            3 = Die Pappe wird beim Saugen weich. → Ausweicherklärung" size="0.85" />
+            <info label="5 (nur Nachtest). Warum zeigte der Sensor in jeder Lage denselben Druck?" italic="true" size="0.85" />
+            <info label="1 = Ruhende Luft drückt von allen Seiten gleich stark. → richtig
+            2 = Ruhende Luft drückt gar nicht, deshalb ändert sich nichts. → ruhende Luft tut nichts
+            3 = Der Sensor misst nur den Druck von oben. → Ausweicherklärung" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = ja, mit der Oberseite nach oben ist er am größten → Luftdruck wirkt nur nach unten" size="0.85" />
+            <info label="2 = nein, er bleibt gleich → ERWARTET" size="0.85" />
+            <info label="3 = ja, mit der Oberseite nach unten ist er am größten → Druck wirkt nur von unten" size="0.85" />
+            <info label="4 = es gibt gar keinen Druck, die Luft bewegt sich ja nicht → ruhende Luft tut nichts" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Drückt ruhende Luft? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Blatt Papier liegt auf dem Tisch. Die Luft drückt auf das Papier …" bold="true" />
+            <dropdown default="0">
+                <output>pre_papier</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nur von oben</map>
+                <map value="2">von allen Seiten gleich stark</map>
+                <map value="3">gar nicht, weil sie sich nicht bewegt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_papier_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Beim Trinken mit dem Strohhalm steigt der Saft nach oben, weil …" bold="true" />
+            <dropdown default="0">
+                <output>pre_strohhalm</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">man ihn hochsaugt</map>
+                <map value="2">die Luft außen auf den Saft drückt und ihn hochschiebt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_strohhalm_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Luft kann nur dann drücken, wenn sie sich bewegt." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_bewegt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_bewegt">
+                <input>pre_bewegt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Drückt ruhende Luft? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst einen Gefrierbeutel mit Zip-Verschluss, in den der mini mit etwas Luft passt." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Ändert sich der angezeigte Druck, wenn du den mini langsam in verschiedene Lagen drehst?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">ja, mit der Oberseite nach oben ist er am größten</map>
+                <map value="2">nein, er bleibt gleich</map>
+                <map value="3">ja, mit der Oberseite nach unten ist er am größten</map>
+                <map value="4">es gibt gar keinen Druck, die Luft bewegt sich ja nicht</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Druck relativ zum Start" labelX="Zeit" unitX="s" labelY="Druckänderung" unitY="hPa" scaleMinY="fixed" scaleMaxY="fixed" minY="-1" maxY="1" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">p_rel</input>
+            </graph>
+            <value visibility="vorhersage" label="Druck" precision="2" unit="hPa">
+                <input>p_avg</input>
+            </value>
+            <value visibility="vorhersage" label="Lage des mini" precision="2">
+                <input>lage</input>
+                <map min="0.7">Oberseite zeigt nach oben</map>
+                <map max="-0.7">Oberseite zeigt nach unten</map>
+                <map>steht hochkant / schräg</map>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Drehen" bold="true" />
+            <info visibility="vorhersage" label="Halte den mini mit zwei Fingern am Rand und drehe ihn langsam: Oberseite nach oben, zur Seite, nach unten. Halte jede Lage einige Sekunden. Das dauert etwa 10 Sekunden. Danach tippe:" />
+            <value visibility="vorhersage" label="Größter Druckunterschied der letzten Sekunden" precision="2" unit="hPa">
+                <input>dp10</input>
+            </value>
+            <button visibility="vorhersage" label="Druckunterschied beim Drehen festhalten">
+                <input type="buffer">dp10</input>
+                <output>dp_drehen</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Festgehaltener Unterschied beim Drehen" precision="2" unit="hPa">
+                <input>dp_drehen</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Beutel zusammendrücken" bold="true" />
+            <info visibility="vorhersage" label="Lege den mini mit etwas Luft in den Beutel und verschließe ihn. Die Luft im Beutel strömt nicht. Tippe, solange der Beutel locker liegt:" />
+            <button visibility="vorhersage" label="Beutel liegt locker: Bezugswert">
+                <input type="buffer">p_avg</input>
+                <output>p_ref_b</output>
+                <input type="buffer">tp_now</input>
+                <output>t_mark</output>
+            </button>
+            <info visibility="vorhersage" label="Drücke den Beutel jetzt mit beiden Händen zusammen (ohne den mini zu quetschen) und halte den Druck:" />
+            <value visibility="vorhersage" label="Druckänderung im Beutel" precision="1" unit="hPa" size="1.5">
+                <input>dp_beutel_now</input>
+            </value>
+            <button visibility="vorhersage" label="Beim Drücken festhalten">
+                <input type="buffer">dp_beutel_now</input>
+                <output>dp_beutel</output>
+            </button>
+            <graph visibility="vorhersage" label="Druckänderung im Beutel (automatisch skaliert)" labelX="Zeit" unitX="s" labelY="Druckänderung" unitY="hPa" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">p_rel</input>
+            </graph>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Die Luft im Beutel bewegt sich kaum und drückt trotzdem stärker. In welche Richtung drückt sie? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Drückt ruhende Luft? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Blatt Papier liegt auf dem Tisch. Die Luft drückt auf das Papier …" bold="true" />
+            <dropdown default="0">
+                <output>post_papier</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">nur von oben</map>
+                <map value="2">von allen Seiten gleich stark</map>
+                <map value="3">gar nicht, weil sie sich nicht bewegt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_papier_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Beim Trinken mit dem Strohhalm steigt der Saft nach oben, weil …" bold="true" />
+            <dropdown default="0">
+                <output>post_strohhalm</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">man ihn hochsaugt</map>
+                <map value="2">die Luft außen auf den Saft drückt und ihn hochschiebt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_strohhalm_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Luft kann nur dann drücken, wenn sie sich bewegt." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_bewegt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_bewegt">
+                <input>post_bewegt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Du saugst die Luft aus einem leeren Getränkekarton und er knickt zusammen. Warum?" bold="true" />
+            <dropdown default="0">
+                <output>post_karton</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Das Saugen zieht die Wände nach innen.</map>
+                <map value="2">Die Luft außen drückt stärker als die wenige Luft innen.</map>
+                <map value="3">Die Pappe wird beim Saugen weich.</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum zeigte der Sensor in jeder Lage denselben Druck?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Ruhende Luft drückt von allen Seiten gleich stark.</map>
+                <map value="2">Ruhende Luft drückt gar nicht, deshalb ändert sich nichts.</map>
+                <map value="3">Der Sensor misst nur den Druck von oben.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung Druck">
+            <data name="Zeit (s)">tp</data>
+            <data name="Druck (hPa)">p</data>
+            <data name="Druck relativ (hPa)">p_rel</data>
+        </set>
+        <set name="Messung Lage">
+            <data name="Zeit (s)">ta</data>
+            <data name="a_z (m/s²)">az</data>
+            <data name="|a| (m/s²)">a_abs</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Druckunterschied beim Drehen (hPa)">dp_drehen</data>
+            <data name="Druckanstieg im Beutel (hPa)">dp_beutel</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_papier">pre_papier</data>
+            <data name="pre_papier_sicher">pre_papier_sicher</data>
+            <data name="pre_strohhalm">pre_strohhalm</data>
+            <data name="pre_strohhalm_sicher">pre_strohhalm_sicher</data>
+            <data name="pre_bewegt">pre_bewegt</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_papier">post_papier</data>
+            <data name="post_papier_sicher">post_papier_sicher</data>
+            <data name="post_strohhalm">post_strohhalm</data>
+            <data name="post_strohhalm_sicher">post_strohhalm_sicher</data>
+            <data name="post_bewegt">post_bewegt</data>
+            <data name="post_karton">post_karton</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_drueckt" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_papier" type="buffer" keep="true">pre_papier</send>
+            <send id="pre_papier_sicher" type="buffer" keep="true">pre_papier_sicher</send>
+            <send id="pre_strohhalm" type="buffer" keep="true">pre_strohhalm</send>
+            <send id="pre_strohhalm_sicher" type="buffer" keep="true">pre_strohhalm_sicher</send>
+            <send id="pre_bewegt" type="buffer" keep="true">pre_bewegt</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=luft_drueckt" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="dp_drehen" type="buffer" keep="true">dp_drehen</send>
+            <send id="dp_beutel" type="buffer" keep="true">dp_beutel</send>
+            <send id="post_papier" type="buffer" keep="true">post_papier</send>
+            <send id="post_papier_sicher" type="buffer" keep="true">post_papier_sicher</send>
+            <send id="post_strohhalm" type="buffer" keep="true">post_strohhalm</send>
+            <send id="post_strohhalm_sicher" type="buffer" keep="true">post_strohhalm_sicher</send>
+            <send id="post_bewegt" type="buffer" keep="true">post_bewegt</send>
+            <send id="post_karton" type="buffer" keep="true">post_karton</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

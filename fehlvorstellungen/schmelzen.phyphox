@@ -1,0 +1,458 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Wärme rein, Temperatur gleich?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Temperatur in Eiswasser, während das Eis schmilzt) und Nachtest zur Vorstellung „Wärmezufuhr führt immer zu einer Temperaturerhöhung“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t</container>
+        <container size="0">temp</container>
+        <container size="0">hum</container>
+        <container size="1">t_now</container>
+        <container size="1">T_now</container>
+        <container size="1">H_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1">t_start</container>
+        <container size="1">T_plateau</container>
+        <container size="1">t_melt</container>
+        <container size="1">T_melt</container>
+        <container size="1">T_end</container>
+        <container size="1">t_dauer</container>
+        <container size="1">dT_nach</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_eiswasser</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_eiswasser_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_energie</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_energie_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_immer</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_eiswasser</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_eiswasser_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_energie</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_energie_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_immer</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kochen</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" subscribeOnStart="true">
+            <!-- HDC1080 an, Messintervall 20 x 100 ms -->
+            <config char="cddf1006-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0114</config>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0">temp</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">hum</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">t</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">temp</input>
+            <output>T_now</output>
+        </append>
+        <append>
+            <input keep="true">hum</input>
+            <output>H_now</output>
+        </append>
+        <append>
+            <input keep="true">t</input>
+            <output>t_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_melt</input>
+            <input keep="true">t_start</input>
+            <output>t_dauer</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">T_end</input>
+            <input keep="true">T_melt</input>
+            <output>dT_nach</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_eiswasser</input>
+            <input keep="true">pre_eiswasser_sicher</input>
+            <input keep="true">pre_energie</input>
+            <input keep="true">pre_energie_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_eiswasser</input>
+            <input keep="true">post_eiswasser_sicher</input>
+            <input keep="true">post_energie</input>
+            <input keep="true">post_energie_sicher</input>
+            <input keep="true">post_kochen</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Wärme rein, Temperatur gleich? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden sehen, dass Wärmezufuhr nicht automatisch die Temperatur erhöht: Beim Schmelzen fließt Energie aus dem Zimmer ins Glas, die Temperatur bleibt aber nahe 0 °C, bis das Eis geschmolzen ist. Erst danach steigt sie." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Wärmezufuhr führt immer zu einer Temperaturerhöhung“ (Schecker u. a. 2018, S. 174). Verwandt: Wärme und Temperatur werden nicht unterschieden; Kälte als eigener Stoff." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Zum Schmelzen von 1 g Eis braucht man rund 334 J (Schmelzwärme) – so viel, wie 1 g Wasser um etwa 80 K erwärmt. Solange Eis und Wasser im Gleichgewicht sind, bleibt die Temperatur bei 0 °C." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="Nach dem Eintauchen fällt die Temperatur auf etwa 0 bis 2 °C (der Beutel und die Luft darin isolieren etwas) und bleibt dort, solange Eis da ist. Danach steigt sie langsam in Richtung Zimmertemperatur." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Machbarkeit zuerst testen: Der Sensor misst die Luft im Beutel, die Angleichung ist träge. Beutel wirklich dicht, sonst Wasser am mini. Kondenswasser im Beutel kann die Feuchtemessung sättigen. Dauer je nach Eismenge 30–90 Minuten – wenig Eis und ein kleines Glas verkürzen den Versuch. Funkverbindung durch Wasser vorher prüfen (mini möglichst nah an der Oberfläche)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Glas mit Eiswasser steht in einem warmen Zimmer. Solange noch Eis im Wasser schwimmt, …" italic="true" size="0.85" />
+            <info label="1 = steigt die Temperatur langsam → Wärmezufuhr = Temperaturanstieg
+            2 = bleibt die Temperatur gleich → richtig
+            3 = sinkt die Temperatur → Eis „gibt Kälte ab“" size="0.85" />
+            <info label="2. Wohin geht die Energie, die das Eiswasser aus dem warmen Zimmer aufnimmt?" italic="true" size="0.85" />
+            <info label="1 = Sie erhöht die Temperatur. → Wärmezufuhr = Temperaturanstieg
+            2 = Sie schmilzt das Eis. → richtig
+            3 = Sie geht verloren. → Energie geht verloren" size="0.85" />
+            <info label="3. Wenn man einem Körper Wärme zuführt, wird er immer wärmer." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Wasser kocht auf dem Herd. Du drehst von voller auf halbe Leistung, es kocht aber weiter. Die Temperatur des Wassers …" italic="true" size="0.85" />
+            <info label="1 = sinkt deutlich → Temperatur = zugeführte Leistung
+            2 = bleibt bei etwa 100 °C → richtig
+            3 = steigt weiter an → Wärmezufuhr = Temperaturanstieg" size="0.85" />
+            <info label="5 (nur Nachtest). Warum blieb die Temperatur im Experiment nahe 0 °C, solange noch Eis da war?" italic="true" size="0.85" />
+            <info label="1 = Das Eis gibt Kälte ab, die die Wärme aufhebt. → Kälte als eigener Stoff
+            2 = Die zugeführte Energie wird zum Schmelzen des Eises gebraucht. → richtig
+            3 = Solange Eis da ist, kommt keine Wärme ins Glas. → keine Wärmezufuhr" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = sie steigt langsam und gleichmäßig → Wärmezufuhr = Temperaturanstieg" size="0.85" />
+            <info label="2 = sie bleibt nahe 0 °C, bis das Eis geschmolzen ist → ERWARTET" size="0.85" />
+            <info label="3 = sie sinkt immer weiter → Eis gibt Kälte ab" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Wärme rein, Temperatur gleich? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Glas mit Eiswasser steht in einem warmen Zimmer. Solange noch Eis im Wasser schwimmt, …" bold="true" />
+            <dropdown default="0">
+                <output>pre_eiswasser</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">steigt die Temperatur langsam</map>
+                <map value="2">bleibt die Temperatur gleich</map>
+                <map value="3">sinkt die Temperatur</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_eiswasser_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Wohin geht die Energie, die das Eiswasser aus dem warmen Zimmer aufnimmt?" bold="true" />
+            <dropdown default="0">
+                <output>pre_energie</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Sie erhöht die Temperatur.</map>
+                <map value="2">Sie schmilzt das Eis.</map>
+                <map value="3">Sie geht verloren.</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_energie_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Wenn man einem Körper Wärme zuführt, wird er immer wärmer." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_immer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_immer">
+                <input>pre_immer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Wärme rein, Temperatur gleich? – Experiment" bold="true" size="1.2" />
+            <info label="Du brauchst ein Glas, viel zerstoßenes Eis, wenig Wasser und einen dichten Gefrierbeutel (Zip-Beutel). Der mini kommt in den Beutel, die Luft möglichst herausdrücken, gut verschließen." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Das Glas mit viel Eis steht im warmen Zimmer, das ständig Wärme liefert. Was passiert mit der Temperatur am mini, solange noch Eis da ist?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sie steigt langsam und gleichmäßig</map>
+                <map value="2">sie bleibt nahe 0 °C, bis das Eis geschmolzen ist</map>
+                <map value="3">sie sinkt immer weiter</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Temperatur" labelX="Zeit" unitX="s" labelY="Temperatur" unitY="°C" scaleMinY="fixed" scaleMaxY="fixed" minY="-5" maxY="25" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">temp</input>
+            </graph>
+            <value visibility="vorhersage" label="Temperatur jetzt" precision="2" unit="°C">
+                <input>T_now</input>
+            </value>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – mini ins Eiswasser" bold="true" />
+            <info visibility="vorhersage" label="Drücke den Beutel mit dem mini tief zwischen das Eis, sodass er rundum bedeckt ist. Tippe dann:" />
+            <button visibility="vorhersage" label="mini ist im Eiswasser">
+                <input type="buffer">t_now</input>
+                <output>t_start</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <info visibility="vorhersage" label="Warte, bis die Temperatur nicht mehr fällt (einige Minuten). Solange noch Eis schwimmt, tippe:" />
+            <button visibility="vorhersage" label="Es ist noch Eis da – Wert festhalten">
+                <input type="buffer">T_now</input>
+                <output>T_plateau</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Temperatur, solange Eis da ist" precision="2" unit="°C">
+                <input>T_plateau</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Eis geschmolzen" bold="true" />
+            <info visibility="vorhersage" label="Lass das Glas stehen. Rühre ab und zu vorsichtig um. Sobald das letzte Eis geschmolzen ist, tippe:" />
+            <button visibility="vorhersage" label="Das Eis ist ganz geschmolzen">
+                <input type="buffer">t_now</input>
+                <output>t_melt</output>
+                <input type="buffer">T_now</input>
+                <output>T_melt</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Dauer, bis das Eis geschmolzen war" precision="0" unit="s">
+                <input>t_dauer</input>
+            </value>
+            <info visibility="vorhersage" label="Miss danach noch etwa 10 Minuten weiter und tippe dann:" />
+            <button visibility="vorhersage" label="10 Minuten nach dem Schmelzen">
+                <input type="buffer">T_now</input>
+                <output>T_end</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Anstieg in den 10 Minuten nach dem Schmelzen" precision="2" unit="K">
+                <input>dT_nach</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Wann stieg die Temperatur – während des Schmelzens oder danach? Woher kam in beiden Phasen die Energie? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Wärme rein, Temperatur gleich? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Glas mit Eiswasser steht in einem warmen Zimmer. Solange noch Eis im Wasser schwimmt, …" bold="true" />
+            <dropdown default="0">
+                <output>post_eiswasser</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">steigt die Temperatur langsam</map>
+                <map value="2">bleibt die Temperatur gleich</map>
+                <map value="3">sinkt die Temperatur</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_eiswasser_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Wohin geht die Energie, die das Eiswasser aus dem warmen Zimmer aufnimmt?" bold="true" />
+            <dropdown default="0">
+                <output>post_energie</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Sie erhöht die Temperatur.</map>
+                <map value="2">Sie schmilzt das Eis.</map>
+                <map value="3">Sie geht verloren.</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_energie_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Wenn man einem Körper Wärme zuführt, wird er immer wärmer." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_immer</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_immer">
+                <input>post_immer</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Wasser kocht auf dem Herd. Du drehst von voller auf halbe Leistung, es kocht aber weiter. Die Temperatur des Wassers …" bold="true" />
+            <dropdown default="0">
+                <output>post_kochen</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sinkt deutlich</map>
+                <map value="2">bleibt bei etwa 100 °C</map>
+                <map value="3">steigt weiter an</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Warum blieb die Temperatur im Experiment nahe 0 °C, solange noch Eis da war?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Das Eis gibt Kälte ab, die die Wärme aufhebt.</map>
+                <map value="2">Die zugeführte Energie wird zum Schmelzen des Eises gebraucht.</map>
+                <map value="3">Solange Eis da ist, kommt keine Wärme ins Glas.</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung">
+            <data name="Zeit (s)">t</data>
+            <data name="Temperatur (°C)">temp</data>
+            <data name="Relative Feuchte (%)">hum</data>
+        </set>
+        <set name="Marker">
+            <data name="Start im Eiswasser (s)">t_start</data>
+            <data name="Eis geschmolzen (s)">t_melt</data>
+            <data name="T geschmolzen (°C)">T_melt</data>
+            <data name="T 10 min später (°C)">T_end</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Temperatur mit Eis (°C)">T_plateau</data>
+            <data name="Dauer bis geschmolzen (s)">t_dauer</data>
+            <data name="Anstieg nach dem Schmelzen (K)">dT_nach</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_eiswasser">pre_eiswasser</data>
+            <data name="pre_eiswasser_sicher">pre_eiswasser_sicher</data>
+            <data name="pre_energie">pre_energie</data>
+            <data name="pre_energie_sicher">pre_energie_sicher</data>
+            <data name="pre_immer">pre_immer</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_eiswasser">post_eiswasser</data>
+            <data name="post_eiswasser_sicher">post_eiswasser_sicher</data>
+            <data name="post_energie">post_energie</data>
+            <data name="post_energie_sicher">post_energie_sicher</data>
+            <data name="post_immer">post_immer</data>
+            <data name="post_kochen">post_kochen</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=schmelzen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_eiswasser" type="buffer" keep="true">pre_eiswasser</send>
+            <send id="pre_eiswasser_sicher" type="buffer" keep="true">pre_eiswasser_sicher</send>
+            <send id="pre_energie" type="buffer" keep="true">pre_energie</send>
+            <send id="pre_energie_sicher" type="buffer" keep="true">pre_energie_sicher</send>
+            <send id="pre_immer" type="buffer" keep="true">pre_immer</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=schmelzen" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="T_plateau" type="buffer" keep="true">T_plateau</send>
+            <send id="t_dauer" type="buffer" keep="true">t_dauer</send>
+            <send id="dT_nach" type="buffer" keep="true">dT_nach</send>
+            <send id="post_eiswasser" type="buffer" keep="true">post_eiswasser</send>
+            <send id="post_eiswasser_sicher" type="buffer" keep="true">post_eiswasser_sicher</send>
+            <send id="post_energie" type="buffer" keep="true">post_energie</send>
+            <send id="post_energie_sicher" type="buffer" keep="true">post_energie_sicher</send>
+            <send id="post_immer" type="buffer" keep="true">post_immer</send>
+            <send id="post_kochen" type="buffer" keep="true">post_kochen</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

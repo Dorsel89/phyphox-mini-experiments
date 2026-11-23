@@ -1,0 +1,616 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Braucht Bewegung eine Kraft?</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini im Aufzug (Höhe und Geschwindigkeit aus dem Luftdruck, Beschleunigungssensor) und Nachtest zur Vorstellung „Bewegung braucht eine Kraft in Bewegungsrichtung“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">p_raw</container>
+        <container size="0">Tb_raw</container>
+        <container size="0">tp_raw</container>
+        <container size="0">p</container>
+        <container size="0">Tb</container>
+        <container size="0">tp</container>
+        <container size="40">p_win</container>
+        <container size="40">Tb_win</container>
+        <container size="1">p_avg</container>
+        <container size="1">Tb_avg</container>
+        <container size="1">p_now</container>
+        <container size="1">tp_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="0">t_raw</container>
+        <container size="0">ax_raw</container>
+        <container size="0">ay_raw</container>
+        <container size="0">az_raw</container>
+        <container size="0">ta</container>
+        <container size="0">ax</container>
+        <container size="0">ay</container>
+        <container size="0">az</container>
+        <container size="0">a_new</container>
+        <container size="0">a_abs</container>
+        <container size="52">a_win</container>
+        <container size="1">a_avg</container>
+        <container size="1" init="9.81">g0</container>
+        <container size="0">a_rel</container>
+        <container size="1">p_first</container>
+        <container size="0">h</container>
+        <container size="0">hs</container>
+        <container size="0">dhs</container>
+        <container size="0">dtp</container>
+        <container size="0">v</container>
+        <container size="0">tv</container>
+        <container size="1">v_now</container>
+        <container size="1">t_c1</container>
+        <container size="1">t_c2</container>
+        <container size="0">ta_c</container>
+        <container size="0">a_rel_c</container>
+        <container size="1">a_konst</container>
+        <container size="1">a_max</container>
+        <container size="1">a_min</container>
+        <container size="1">v_max</container>
+        <container size="1">v_min</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_aufzug</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_aufzug_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_sonde</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_sonde_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_kraft</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_aufzug</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_aufzug_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_sonde</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_sonde_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kraft</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_puck</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" mtu="247" subscribeOnStart="true">
+            <!-- BMP581 an, Oversampling-Code 5 (5 = 32x), IIR-Code 3 -->
+            <config char="cddf1008-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010503</config>
+            <!-- LSM6DSR: enable=1 (1 Beschl., 3 beides), 52 Hz, Bereich-Code 2, Drehraten-Code 0, float, 5 Werte/Paket -->
+            <config char="cddf1002-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">010302000005</config>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="12">p_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="12">Tb_raw</output>
+            <output char="cddf1007-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="12">tp_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0" repeating="16">t_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4" repeating="16">ax_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8" repeating="16">ay_raw</output>
+            <output char="cddf1001-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="12" repeating="16">az_raw</output>
+        </bluetooth>
+    </input>
+
+    <analysis sleep="0.1">
+        <append>
+            <input keep="true">p_raw</input>
+            <output append="true">p_win</output>
+        </append>
+        <append>
+            <input keep="true">Tb_raw</input>
+            <output append="true">Tb_win</output>
+        </append>
+        <append>
+            <input keep="false">p_raw</input>
+            <output append="true">p</output>
+        </append>
+        <append>
+            <input keep="false">Tb_raw</input>
+            <output append="true">Tb</output>
+        </append>
+        <append>
+            <input keep="false">tp_raw</input>
+            <output append="true">tp</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">p_win</input>
+            <output as="average">p_avg</output>
+        </average>
+        <average>
+            <input as="buffer" keep="true">Tb_win</input>
+            <output as="average">Tb_avg</output>
+        </average>
+        <append>
+            <input keep="true">p</input>
+            <output>p_now</output>
+        </append>
+        <append>
+            <input keep="true">tp</input>
+            <output>tp_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">tp_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="sqrt([1_]^2+[2_]^2+[3_]^2)">
+            <input keep="true">ax_raw</input>
+            <input keep="true">ay_raw</input>
+            <input keep="true">az_raw</input>
+            <output>a_new</output>
+        </formula>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_abs</output>
+        </append>
+        <append>
+            <input keep="true">a_new</input>
+            <output append="true">a_win</output>
+        </append>
+        <append>
+            <input keep="false">t_raw</input>
+            <output append="true">ta</output>
+        </append>
+        <append>
+            <input keep="false">ax_raw</input>
+            <output append="true">ax</output>
+        </append>
+        <append>
+            <input keep="false">ay_raw</input>
+            <output append="true">ay</output>
+        </append>
+        <append>
+            <input keep="false">az_raw</input>
+            <output append="true">az</output>
+        </append>
+        <average>
+            <input as="buffer" keep="true">a_win</input>
+            <output as="average">a_avg</output>
+        </average>
+        <formula formula="[1_]-[2]">
+            <input keep="true">a_abs</input>
+            <input keep="true">g0</input>
+            <output>a_rel</output>
+        </formula>
+        <first>
+            <input as="value" keep="true">p</input>
+            <output as="first">p_first</output>
+        </first>
+        <formula formula="([1]-[2_])*8.43">
+            <input keep="true">p_first</input>
+            <input keep="true">p</input>
+            <output>h</output>
+        </formula>
+        <gausssmooth sigma="8">
+            <input as="in" keep="true">h</input>
+            <output as="out">hs</output>
+        </gausssmooth>
+        <differentiate>
+            <input as="in" keep="true">hs</input>
+            <output as="out">dhs</output>
+        </differentiate>
+        <differentiate>
+            <input as="in" keep="true">tp</input>
+            <output as="out">dtp</output>
+        </differentiate>
+        <formula formula="[1_]/[2_]">
+            <input keep="true">dhs</input>
+            <input keep="true">dtp</input>
+            <output>v</output>
+        </formula>
+        <subrange>
+            <input as="from" type="value">1</input>
+            <input keep="true">tp</input>
+            <output>tv</output>
+        </subrange>
+        <append>
+            <input keep="true">v</input>
+            <output>v_now</output>
+        </append>
+        <rangefilter>
+            <input keep="true">ta</input>
+            <input as="min" keep="true">t_c1</input>
+            <input as="max" keep="true">t_c2</input>
+            <input keep="true">a_rel</input>
+            <output>ta_c</output>
+            <output>a_rel_c</output>
+        </rangefilter>
+        <average>
+            <input as="buffer" keep="true">a_rel_c</input>
+            <output as="average">a_konst</output>
+        </average>
+        <max>
+            <input as="y" keep="true">a_rel</input>
+            <output as="max">a_max</output>
+        </max>
+        <min>
+            <input as="y" keep="true">a_rel</input>
+            <output as="min">a_min</output>
+        </min>
+        <max>
+            <input as="y" keep="true">v</input>
+            <output as="max">v_max</output>
+        </max>
+        <min>
+            <input as="y" keep="true">v</input>
+            <output as="min">v_min</output>
+        </min>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_aufzug</input>
+            <input keep="true">pre_aufzug_sicher</input>
+            <input keep="true">pre_sonde</input>
+            <input keep="true">pre_sonde_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_aufzug</input>
+            <input keep="true">post_aufzug_sicher</input>
+            <input keep="true">post_sonde</input>
+            <input keep="true">post_sonde_sicher</input>
+            <input keep="true">post_puck</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Braucht Bewegung eine Kraft? – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Im Aufzug weicht der Sensor nur beim Anfahren und Bremsen vom Stillstand ab, nicht während der schnellsten, gleichmäßigen Fahrt. Höhe und Geschwindigkeit (aus dem Luftdruck) stehen direkt darüber, sodass Lernende Geschwindigkeit und Kraft trennen können. Ersatzvorstellung: Eine (zusätzliche) Kraft braucht man nur, um die Geschwindigkeit zu ändern." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="„Zur Aufrechterhaltung der Bewegung bedarf es einer Kraft in Bewegungsrichtung“; die „Antriebskraft“ sei proportional zur Geschwindigkeit (Schecker u. a. 2018, S. 73; Handout). Verwandt: Ruhe und gleichförmige Bewegung als wesensverschieden (S. 72)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Der Boden drückt mit F = m·(g + a). Bei gleichförmiger Fahrt ist a = 0, der Sensor zeigt wie im Stillstand. Typische Aufzüge: 0,5–1 m/s² beim Anfahren, 1–2 m/s Fahrgeschwindigkeit. Höhe aus dem Druck: etwa 8,4 m pro hPa; die Geschwindigkeit ist die geglättete Ableitung der Höhe." />
+            <separator height="2" />
+            <info label="Neue phyphox-Funktion" bold="true" />
+            <info label="Im Diagramm „Geschwindigkeit“ markieren die Lernenden per Datenauswahl (Data Picker, ab phyphox 1.2.1) Beginn und Ende der gleichmäßigen Fahrt; daraus wird der mittlere Sensorwert in genau diesem Abschnitt berechnet." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Braucht einen Aufzug. Die Geschwindigkeit aus dem Druck ist verrauscht und um etwa eine Sekunde verzögert (Glättung und IIR-Filter). Der Bezugswert im Stillstand gleicht den Offset des Sensors aus. Ersatz ohne Aufzug: gleichmäßig rollender Wagen (weniger sauber, keine Druckmessung)." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Ein Aufzug fährt mit gleichbleibender Geschwindigkeit nach oben. Die Kraft des Bodens auf deine Füße ist …" italic="true" size="0.85" />
+            <info label="1 = größer als im Stehen → Bewegung braucht Kraft in Bewegungsrichtung
+            2 = gleich wie im Stehen → richtig
+            3 = kleiner als im Stehen → unklare Vorstellung" size="0.85" />
+            <info label="2. Eine Raumsonde fliegt weit weg von allen Planeten mit ausgeschaltetem Triebwerk. Sie …" italic="true" size="0.85" />
+            <info label="1 = wird langsamer und bleibt irgendwann stehen → Bewegung braucht Kraft (Impetus verbraucht sich)
+            2 = fliegt gleich schnell weiter → richtig
+            3 = wird schneller → unklare Vorstellung" size="0.85" />
+            <info label="3. Damit sich etwas gleichmäßig weiterbewegt, muss ständig eine Kraft in Bewegungsrichtung wirken." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Ein Eishockey-Puck gleitet nach dem Schuss über sehr glattes Eis (ohne Reibung). Welche Kraft in Bewegungsrichtung wirkt auf ihn?" italic="true" size="0.85" />
+            <info label="1 = die Kraft des Schlägers, die langsam nachlässt → Impetus
+            2 = keine → richtig
+            3 = eine Kraft, die umso größer ist, je schneller er ist → Kraft proportional zur Geschwindigkeit" size="0.85" />
+            <info label="5 (nur Nachtest). Wann zeigte der Sensor im Aufzug (nach oben) mehr als im Stillstand?" italic="true" size="0.85" />
+            <info label="1 = während der ganzen Fahrt nach oben → Bewegung braucht Kraft
+            2 = nur beim Anfahren, also während die Geschwindigkeit zunahm → richtig
+            3 = nur bei der schnellsten Fahrt → Kraft proportional zur Geschwindigkeit" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = während der ganzen Fahrt nach oben → Bewegung braucht Kraft" size="0.85" />
+            <info label="2 = nur beim Anfahren → ERWARTET" size="0.85" />
+            <info label="3 = nur beim Bremsen → unklare Vorstellung" size="0.85" />
+            <info label="4 = nie → Sensor misst nur Ruhe" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Braucht Bewegung eine Kraft? – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Ein Aufzug fährt mit gleichbleibender Geschwindigkeit nach oben. Die Kraft des Bodens auf deine Füße ist …" bold="true" />
+            <dropdown default="0">
+                <output>pre_aufzug</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">größer als im Stehen</map>
+                <map value="2">gleich wie im Stehen</map>
+                <map value="3">kleiner als im Stehen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_aufzug_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Eine Raumsonde fliegt weit weg von allen Planeten mit ausgeschaltetem Triebwerk. Sie …" bold="true" />
+            <dropdown default="0">
+                <output>pre_sonde</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">wird langsamer und bleibt irgendwann stehen</map>
+                <map value="2">fliegt gleich schnell weiter</map>
+                <map value="3">wird schneller</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_sonde_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Damit sich etwas gleichmäßig weiterbewegt, muss ständig eine Kraft in Bewegungsrichtung wirken." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_kraft</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_kraft">
+                <input>pre_kraft</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Braucht Bewegung eine Kraft? – Experiment" bold="true" size="1.2" />
+            <info label="So funktioniert der Beschleunigungssensor: Er fühlt, wie stark er gerade geschoben, gehalten oder gezogen wird – also die Kraft der Unterlage, der Hand oder der Schnur (geteilt durch seine Masse). Die Schwerkraft selbst fühlt er nicht. Liegt er ruhig auf dem Tisch, zeigt er deshalb etwa 9,8 m/s², weil der Tisch ihn nach oben drückt." />
+            <info label="Du brauchst einen Aufzug, der über mehrere Stockwerke fährt. Lege den mini flach auf den Boden des Aufzugs." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Der Aufzug fährt nach oben. Wann zeigt der Sensor mehr als im Stillstand?" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">während der ganzen Fahrt nach oben</map>
+                <map value="2">nur beim Anfahren</map>
+                <map value="3">nur beim Bremsen</map>
+                <map value="4">nie</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Höhe (aus dem Luftdruck)" labelX="Zeit" unitX="s" labelY="Höhe" unitY="m" partialUpdate="true">
+                <input axis="x">tp</input>
+                <input axis="y">h</input>
+            </graph>
+            <graph visibility="vorhersage" label="Geschwindigkeit nach oben" labelX="Zeit" unitX="s" labelY="v" unitY="m/s" pickLabel="Gleichmäßige Fahrt markieren" partialUpdate="true">
+                <input axis="x">tv</input>
+                <input axis="y">v</input>
+                <output axis="x" label="Beginn der gleichmäßigen Fahrt">t_c1</output>
+                <output axis="x" label="Ende der gleichmäßigen Fahrt">t_c2</output>
+            </graph>
+            <graph visibility="vorhersage" label="Sensor minus Stillstand" labelX="Zeit" unitX="s" labelY="a − a₀" unitY="m/s²" scaleMinY="fixed" scaleMaxY="fixed" minY="-2" maxY="2" partialUpdate="true">
+                <input axis="x">ta</input>
+                <input axis="y">a_rel</input>
+            </graph>
+            <value visibility="vorhersage" label="Geschwindigkeit" precision="2" unit="m/s">
+                <input>v_now</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Stillstand" bold="true" />
+            <info visibility="vorhersage" label="Lege den mini auf den Boden des stehenden Aufzugs. Warte 5 Sekunden und tippe:" />
+            <button visibility="vorhersage" label="Stillstand: Bezugswert festhalten">
+                <input type="buffer">a_avg</input>
+                <output>g0</output>
+            </button>
+            <value visibility="vorhersage" label="Sensor im Stillstand" precision="2" unit="m/s²">
+                <input>g0</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Fahren" bold="true" />
+            <info visibility="vorhersage" label="Fahre mehrere Stockwerke nach oben (und gern auch wieder nach unten). Rühre den mini während der Fahrt nicht an." />
+            <value visibility="vorhersage" label="Größter Wert über dem Stillstand" precision="2" unit="m/s²">
+                <input>a_max</input>
+            </value>
+            <value visibility="vorhersage" label="Kleinster Wert unter dem Stillstand" precision="2" unit="m/s²">
+                <input>a_min</input>
+            </value>
+            <value visibility="vorhersage" label="Höchste Geschwindigkeit nach oben" precision="2" unit="m/s">
+                <input>v_max</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 4 – Gleichmäßige Fahrt untersuchen" bold="true" />
+            <info visibility="vorhersage" label="Tippe auf das Diagramm „Geschwindigkeit“, dann auf „Gleichmäßige Fahrt markieren“. Wähle einen Punkt am Anfang und einen am Ende des flachen Abschnitts mit der höchsten Geschwindigkeit." />
+            <value visibility="vorhersage" label="Mittlerer Wert während der gleichmäßigen Fahrt" precision="2" unit="m/s²" size="1.5">
+                <input>a_konst</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Wann weicht der Sensor vom Stillstand ab: wenn der Aufzug schnell ist oder wenn sich seine Geschwindigkeit ändert? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Braucht Bewegung eine Kraft? – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Ein Aufzug fährt mit gleichbleibender Geschwindigkeit nach oben. Die Kraft des Bodens auf deine Füße ist …" bold="true" />
+            <dropdown default="0">
+                <output>post_aufzug</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">größer als im Stehen</map>
+                <map value="2">gleich wie im Stehen</map>
+                <map value="3">kleiner als im Stehen</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_aufzug_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Eine Raumsonde fliegt weit weg von allen Planeten mit ausgeschaltetem Triebwerk. Sie …" bold="true" />
+            <dropdown default="0">
+                <output>post_sonde</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">wird langsamer und bleibt irgendwann stehen</map>
+                <map value="2">fliegt gleich schnell weiter</map>
+                <map value="3">wird schneller</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_sonde_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Damit sich etwas gleichmäßig weiterbewegt, muss ständig eine Kraft in Bewegungsrichtung wirken." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_kraft</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_kraft">
+                <input>post_kraft</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Ein Eishockey-Puck gleitet nach dem Schuss über sehr glattes Eis (ohne Reibung). Welche Kraft in Bewegungsrichtung wirkt auf ihn?" bold="true" />
+            <dropdown default="0">
+                <output>post_puck</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">die Kraft des Schlägers, die langsam nachlässt</map>
+                <map value="2">keine</map>
+                <map value="3">eine Kraft, die umso größer ist, je schneller er ist</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Wann zeigte der Sensor im Aufzug (nach oben) mehr als im Stillstand?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">während der ganzen Fahrt nach oben</map>
+                <map value="2">nur beim Anfahren, also während die Geschwindigkeit zunahm</map>
+                <map value="3">nur bei der schnellsten Fahrt</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung Druck">
+            <data name="Zeit (s)">tp</data>
+            <data name="Druck (hPa)">p</data>
+            <data name="Höhe (m)">h</data>
+        </set>
+        <set name="Geschwindigkeit">
+            <data name="Zeit (s)">tv</data>
+            <data name="v (m/s)">v</data>
+        </set>
+        <set name="Messung Beschleunigung">
+            <data name="Zeit (s)">ta</data>
+            <data name="|a| (m/s²)">a_abs</data>
+            <data name="a - a0 (m/s²)">a_rel</data>
+        </set>
+        <set name="Auswahl">
+            <data name="Beginn gleichmäßig (s)">t_c1</data>
+            <data name="Ende gleichmäßig (s)">t_c2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Größte Abweichung nach oben (m/s2)">a_max</data>
+            <data name="Größte Abweichung nach unten (m/s2)">a_min</data>
+            <data name="Mittel bei gleichmäßiger Fahrt (m/s2)">a_konst</data>
+            <data name="Höchste Geschwindigkeit (m/s)">v_max</data>
+            <data name="Bezugswert Stillstand (m/s2)">g0</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_aufzug">pre_aufzug</data>
+            <data name="pre_aufzug_sicher">pre_aufzug_sicher</data>
+            <data name="pre_sonde">pre_sonde</data>
+            <data name="pre_sonde_sicher">pre_sonde_sicher</data>
+            <data name="pre_kraft">pre_kraft</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_aufzug">post_aufzug</data>
+            <data name="post_aufzug_sicher">post_aufzug_sicher</data>
+            <data name="post_sonde">post_sonde</data>
+            <data name="post_sonde_sicher">post_sonde_sicher</data>
+            <data name="post_kraft">post_kraft</data>
+            <data name="post_puck">post_puck</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=aufzug" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_aufzug" type="buffer" keep="true">pre_aufzug</send>
+            <send id="pre_aufzug_sicher" type="buffer" keep="true">pre_aufzug_sicher</send>
+            <send id="pre_sonde" type="buffer" keep="true">pre_sonde</send>
+            <send id="pre_sonde_sicher" type="buffer" keep="true">pre_sonde_sicher</send>
+            <send id="pre_kraft" type="buffer" keep="true">pre_kraft</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=aufzug" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="a_max" type="buffer" keep="true">a_max</send>
+            <send id="a_min" type="buffer" keep="true">a_min</send>
+            <send id="a_konst" type="buffer" keep="true">a_konst</send>
+            <send id="v_max" type="buffer" keep="true">v_max</send>
+            <send id="g0" type="buffer" keep="true">g0</send>
+            <send id="post_aufzug" type="buffer" keep="true">post_aufzug</send>
+            <send id="post_aufzug_sicher" type="buffer" keep="true">post_aufzug_sicher</send>
+            <send id="post_sonde" type="buffer" keep="true">post_sonde</send>
+            <send id="post_sonde_sicher" type="buffer" keep="true">post_sonde_sicher</send>
+            <send id="post_kraft" type="buffer" keep="true">post_kraft</send>
+            <send id="post_puck" type="buffer" keep="true">post_puck</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>

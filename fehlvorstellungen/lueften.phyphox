@@ -1,0 +1,552 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phyphox version="1.20" locale="de">
+    <title>Feuchte Luft beim Lüften</title>
+    <category>phyphox:mini Fehlvorstellungen</category>
+    <color>ADEBB3</color>
+    <description>Vortest, Experiment mit dem phyphox:mini (Temperatur, relative und absolute Luftfeuchtigkeit, CO₂ beim Stoßlüften oder im abgekühlten Glas) und Nachtest zur Vorstellung „Relative Luftfeuchtigkeit = Wassermenge in der Luft“.</description>
+
+    <data-containers>
+        <!-- Messdaten und Auswertung -->
+        <container size="0">t</container>
+        <container size="0">temp</container>
+        <container size="0">hum</container>
+        <container size="1">t_now</container>
+        <container size="1">T_now</container>
+        <container size="1">H_now</container>
+        <container size="1">t_mark</container>
+        <container size="1">t_since</container>
+        <container size="1" init="1" clearGroup="_">variante</container>
+        <container size="1">var_a</container>
+        <container size="1">var_b</container>
+        <container size="1">show_a</container>
+        <container size="1">show_b</container>
+        <container size="0">ah</container>
+        <container size="1">AH_now</container>
+        <container size="0">tc</container>
+        <container size="0">co2</container>
+        <container size="1">CO2_now</container>
+        <container size="1">T_1</container>
+        <container size="1">H_1</container>
+        <container size="1">AH_1</container>
+        <container size="1">C_1</container>
+        <container size="1">T_2</container>
+        <container size="1">H_2</container>
+        <container size="1">AH_2</container>
+        <container size="1">C_2</container>
+        <container size="1">dH</container>
+        <container size="1">dAH</container>
+        <container size="1">dCO2</container>
+
+        <!-- Vortest -->
+        <container size="1" clearGroup="Antworten Vortest">pre_lueften</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_lueften_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_glas</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_glas_sicher</container>
+        <container size="1" clearGroup="Antworten Vortest">pre_kalt</container>
+
+        <!-- Vorhersage und Nachtest -->
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">vorhersage</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_lueften</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_lueften_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_glas</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_glas_sicher</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_kalt</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_scheibe</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">post_erklaerung</container>
+
+        <!-- Steuerung der Anzeige (visibility) -->
+        <container size="1">vorhersage_offen</container>
+        <container size="1">pre_offen</container>
+        <container size="1">post_offen</container>
+
+        <!-- Phase und Rückmeldung des Servers -->
+        <container size="1" init="1" clearGroup="_">phase_pre</container>
+        <container size="1" init="2" clearGroup="_">phase_post</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_stored</container>
+        <container size="1" clearGroup="Antworten Vortest">rx_pre_total</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_stored</container>
+        <container size="1" clearGroup="Vorhersage und Antworten Nachtest">rx_post_total</container>
+    </data-containers>
+
+    <input>
+        <bluetooth id="mini" name="phyphox:mini" mode="notification" subscribeOnStart="true">
+            <!-- HDC1080 an, Messintervall 20 x 100 ms -->
+            <config char="cddf1006-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0114</config>
+            <!-- STCC4 an, Messintervall 40 x 100 ms = 4 s -->
+            <config char="cddf100c-30f7-4671-8b43-5e40ba53514a" conversion="hexadecimal">0128</config>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0">temp</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">hum</output>
+            <output char="cddf1005-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="8">t</output>
+            <output char="cddf100b-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="0">co2</output>
+            <output char="cddf100b-30f7-4671-8b43-5e40ba53514a" conversion="float32LittleEndian" offset="4">tc</output>
+        </bluetooth>
+    </input>
+
+    <analysis>
+        <append>
+            <input keep="true">temp</input>
+            <output>T_now</output>
+        </append>
+        <append>
+            <input keep="true">hum</input>
+            <output>H_now</output>
+        </append>
+        <append>
+            <input keep="true">t</input>
+            <output>t_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">t_now</input>
+            <input keep="true">t_mark</input>
+            <output>t_since</output>
+        </formula>
+        <formula formula="1-abs(sign([1]-1))">
+            <input keep="true">variante</input>
+            <output>var_a</output>
+        </formula>
+        <formula formula="1-abs(sign([1]-2))">
+            <input keep="true">variante</input>
+            <output>var_b</output>
+        </formula>
+        <formula formula="[1]*sign([2])">
+            <input keep="true">var_a</input>
+            <input keep="true">vorhersage</input>
+            <output>show_a</output>
+        </formula>
+        <formula formula="[1]*sign([2])">
+            <input keep="true">var_b</input>
+            <input keep="true">vorhersage</input>
+            <output>show_b</output>
+        </formula>
+        <formula formula="6.112*exp(17.62*[1_]/(243.12+[1_]))*[2_]*2.1674/(273.15+[1_])">
+            <input keep="true">temp</input>
+            <input keep="true">hum</input>
+            <output>ah</output>
+        </formula>
+        <append>
+            <input keep="true">ah</input>
+            <output>AH_now</output>
+        </append>
+        <append>
+            <input keep="true">co2</input>
+            <output>CO2_now</output>
+        </append>
+        <formula formula="[1]-[2]">
+            <input keep="true">H_2</input>
+            <input keep="true">H_1</input>
+            <output>dH</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">AH_2</input>
+            <input keep="true">AH_1</input>
+            <output>dAH</output>
+        </formula>
+        <formula formula="[1]-[2]">
+            <input keep="true">C_2</input>
+            <input keep="true">C_1</input>
+            <output>dCO2</output>
+        </formula>
+        <!-- Anzeige steuern: offene Vorhersage und unbeantwortete Fragen -->
+        <formula formula="1-sign([1])">
+            <input keep="true">vorhersage</input>
+            <output>vorhersage_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))">
+            <input keep="true">pre_lueften</input>
+            <input keep="true">pre_lueften_sicher</input>
+            <input keep="true">pre_glas</input>
+            <input keep="true">pre_glas_sicher</input>
+            <output>pre_offen</output>
+        </formula>
+        <formula formula="(1-sign([1]))+(1-sign([2]))+(1-sign([3]))+(1-sign([4]))+(1-sign([5]))+(1-sign([6]))">
+            <input keep="true">post_lueften</input>
+            <input keep="true">post_lueften_sicher</input>
+            <input keep="true">post_glas</input>
+            <input keep="true">post_glas_sicher</input>
+            <input keep="true">post_scheibe</input>
+            <input keep="true">post_erklaerung</input>
+            <output>post_offen</output>
+        </formula>
+    </analysis>
+
+    <views>
+        <!-- BEGIN HINTERGRUND: für den Einsatz im Unterricht entfernen -->
+        <view label="0 Hintergrund">
+            <info label="Feuchte Luft beim Lüften – Hintergrund für Lehrkräfte" bold="true" size="1.2" />
+            <info label="Diese Seite ist nur für die Erprobung gedacht und wird für den Einsatz entfernt." italic="true" size="0.85" />
+            <separator height="2" />
+            <info label="Zweck" bold="true" />
+            <info label="Die Lernenden unterscheiden relative Luftfeuchtigkeit (Prozent der bei dieser Temperatur maximal möglichen Wasserdampfmenge) und absolute Feuchte (Gramm Wasser pro Kubikmeter). Das Experiment zeigt beide Größen nebeneinander; die absolute Feuchte wird aus Temperatur und relativer Feuchte berechnet (Magnus-Formel)." />
+            <separator height="2" />
+            <info label="Fehlvorstellung" bold="true" />
+            <info label="Relative Feuchte wird mit der Wassermenge in der Luft gleichgesetzt; „Lüften bei Regenwetter holt Feuchtigkeit herein“; „Kalte Luft enthält mehr Wasser“. Alltagsvorstellung (eigene Ergänzung im Konzeptpapier)." />
+            <separator height="2" />
+            <info label="Physik" bold="true" />
+            <info label="Kalte Außenluft (2 °C, 100 %) enthält nur etwa 5,6 g/m³ Wasser. Auf 20 °C erwärmt sind das nur noch rund 30 % relative Feuchte, denn bei 20 °C passen etwa 17,3 g/m³. Lüften senkt deshalb die relative Feuchte im Winter. Umgekehrt im Glas: Die Wassermenge bleibt konstant, die maximal mögliche sinkt mit der Temperatur – die relative Feuchte steigt." />
+            <separator height="2" />
+            <info label="Erwartung" bold="true" />
+            <info label="A: rel. Feuchte nach dem Wiederaufwärmen niedriger, absolute Feuchte niedriger, CO₂ fällt deutlich. B: rel. Feuchte steigt beim Abkühlen (pro Kelvin grob 6 % ihres Werts), absolute Feuchte bleibt etwa gleich." />
+            <separator height="2" />
+            <info label="Hinweise" bold="true" />
+            <info label="Dauert 15–20 Minuten und ist wetterabhängig, eher als Hausexperiment geeignet. In Variante B die Funkverbindung durch Glas und Wasser vorher prüfen. Der HDC1080 misst die Luft im Gehäuse, er reagiert träge. Formel für die absolute Feuchte: AH = 6,112 hPa · exp(17,62·T/(243,12 °C+T)) · RH · 2,1674 / (273,15+T), Ergebnis in g/m³." />
+            <separator height="2" />
+            <info label="Antwortschlüssel" bold="true" />
+            <info label="1. Draußen sind es 2 °C und es nieselt. Du lüftest 5 Minuten lang weit und heizt danach wieder auf die alte Temperatur. Die relative Luftfeuchtigkeit im Zimmer ist dann …" italic="true" size="0.85" />
+            <info label="1 = höher als vorher → relative Feuchte = Wassermenge; nasses Wetter bringt Feuchte herein
+            2 = niedriger als vorher → richtig
+            3 = gleich wie vorher → Lüften ändert nichts an der Feuchte" size="0.85" />
+            <info label="2. Ein fest verschlossenes Glas mit Luft wird abgekühlt. Die relative Luftfeuchtigkeit im Glas …" italic="true" size="0.85" />
+            <info label="1 = steigt → richtig
+            2 = sinkt → relative Feuchte folgt der Temperatur
+            3 = bleibt gleich, weil kein Wasser dazukommt → relative Feuchte = Wassermenge" size="0.85" />
+            <info label="3. Kalte Luft enthält mehr Wasser als warme Luft." italic="true" size="0.85" />
+            <info label="Zustimmung (4–5) = Fehlvorstellung" size="0.85" />
+            <info label="4 (nur Nachtest). Im Winter beschlägt die Innenseite einer kalten Fensterscheibe. Warum?" italic="true" size="0.85" />
+            <info label="1 = Feuchtigkeit dringt von draußen durch das Glas. → Feuchte kommt von außen
+            2 = Die Zimmerluft kühlt an der Scheibe ab und kann dort weniger Wasserdampf halten. → richtig
+            3 = Kalte Luft enthält mehr Wasser. → kalte Luft ist feuchter" size="0.85" />
+            <info label="5 (nur Nachtest). Was gibt die relative Luftfeuchtigkeit an?" italic="true" size="0.85" />
+            <info label="1 = wie viele Gramm Wasser in einem Kubikmeter Luft sind → verwechselt mit absoluter Feuchte
+            2 = wie viel Prozent der bei dieser Temperatur höchstens möglichen Wasserdampfmenge in der Luft sind → richtig
+            3 = wie nass sich die Luft anfühlt → Alltagsbegriff" size="0.85" />
+            <info label="Vorhersage im Experiment" italic="true" size="0.85" />
+            <info label="1 = sie steigt → A: Fehlvorstellung / B: erwartet" size="0.85" />
+            <info label="2 = sie bleibt gleich → Fehlvorstellung" size="0.85" />
+            <info label="3 = sie sinkt → A: erwartet / B: Fehlvorstellung" size="0.85" />
+        </view>
+        <!-- END HINTERGRUND -->
+
+        <view label="1 Vortest">
+            <info label="Feuchte Luft beim Lüften – Vortest" bold="true" size="1.2" />
+            <info label="Verbinde den phyphox:mini, lege ihn ruhig auf den Tisch und tippe oben rechts auf ▶. Beantworte dann die Fragen." />
+            <info label="Wenn du die Messung über den Papierkorb löschst, bleiben deine Antworten erhalten, solange du sie im Dialog nicht mit auswählst." size="0.85" />
+            <separator height="2" />
+            <info label="1. Draußen sind es 2 °C und es nieselt. Du lüftest 5 Minuten lang weit und heizt danach wieder auf die alte Temperatur. Die relative Luftfeuchtigkeit im Zimmer ist dann …" bold="true" />
+            <dropdown default="0">
+                <output>pre_lueften</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">höher als vorher</map>
+                <map value="2">niedriger als vorher</map>
+                <map value="3">gleich wie vorher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_lueften_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein fest verschlossenes Glas mit Luft wird abgekühlt. Die relative Luftfeuchtigkeit im Glas …" bold="true" />
+            <dropdown default="0">
+                <output>pre_glas</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">steigt</map>
+                <map value="2">sinkt</map>
+                <map value="3">bleibt gleich, weil kein Wasser dazukommt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>pre_glas_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Kalte Luft enthält mehr Wasser als warme Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>pre_kalt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="pre_kalt">
+                <input>pre_kalt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="pre_offen" color="orange">
+                <input>pre_offen</input>
+            </value>
+            <button label="Vortest absenden" dynamicLabel="rx_pre_stored">
+                <map min="0.5">Vortest übertragen ✓ – erneut senden</map>
+                <trigger>pretest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_pre_total">
+                <input>rx_pre_stored</input>
+            </value>
+            <info label="Danach weiter zum Reiter „2 Experiment“." />
+        </view>
+
+        <view label="2 Experiment">
+            <info label="Feuchte Luft beim Lüften – Experiment" bold="true" size="1.2" />
+            <info label="Variante A braucht ein Zimmer mit Fenster an einem kalten Tag. Variante B braucht ein großes Schraubglas und kaltes Wasser oder eine kalte Fensterbank." />
+            <separator height="2" />
+            <info label="Schritt 1 – Vorhersage" bold="true" />
+            <info label="Wähle zuerst, welche Variante du durchführst:" />
+            <dropdown default="1">
+                <output>variante</output>
+                <map value="1">A: Stoßlüften im Zimmer (ca. 20 min)</map>
+                <map value="2">B: mini im verschlossenen Glas abkühlen (ca. 15 min)</map>
+            </dropdown>
+            <info label="Variante A: Wie ist die relative Luftfeuchtigkeit, nachdem du gelüftet und das Zimmer wieder aufgewärmt hast, im Vergleich zu vorher?" visibility="var_a" />
+            <info label="Variante B: Wie ändert sich die relative Luftfeuchtigkeit im Glas, wenn es abgekühlt wird?" visibility="var_b" />
+            <info label="Deine Vorhersage für die relative Luftfeuchtigkeit:" />
+            <dropdown default="0">
+                <output>vorhersage</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">sie steigt</map>
+                <map value="2">sie bleibt gleich</map>
+                <map value="3">sie sinkt</map>
+            </dropdown>
+            <info label="Wähle zuerst deine Vorhersage. Danach erscheinen die nächsten Schritte." italic="true" visibility="vorhersage_offen" />
+            <graph visibility="vorhersage" label="Temperatur" labelX="Zeit" unitX="s" labelY="Temperatur" unitY="°C" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">temp</input>
+            </graph>
+            <graph visibility="vorhersage" label="Relative Luftfeuchtigkeit" labelX="Zeit" unitX="s" labelY="rel. Feuchte" unitY="%" scaleMinY="fixed" scaleMaxY="fixed" minY="0" maxY="100" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">hum</input>
+            </graph>
+            <graph visibility="vorhersage" label="Absolute Luftfeuchtigkeit (Wassermenge)" labelX="Zeit" unitX="s" labelY="abs. Feuchte" unitY="g/m³" scaleMinY="fixed" minY="0" partialUpdate="true">
+                <input axis="x">t</input>
+                <input axis="y">ah</input>
+            </graph>
+            <graph visibility="vorhersage" label="CO₂" labelX="Zeit" unitX="s" labelY="CO₂" unitY="ppm" partialUpdate="true">
+                <input axis="x">tc</input>
+                <input axis="y">co2</input>
+            </graph>
+            <value visibility="vorhersage" label="Temperatur" precision="1" unit="°C">
+                <input>T_now</input>
+            </value>
+            <value visibility="vorhersage" label="Relative Luftfeuchtigkeit" precision="1" unit="%">
+                <input>H_now</input>
+            </value>
+            <value visibility="vorhersage" label="Absolute Luftfeuchtigkeit" precision="2" unit="g/m³">
+                <input>AH_now</input>
+            </value>
+            <value visibility="vorhersage" label="CO₂" precision="0" unit="ppm">
+                <input>CO2_now</input>
+            </value>
+            <value visibility="vorhersage" label="Zeit seit dem letzten Knopfdruck" precision="0" unit="s">
+                <input>t_since</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 2 – Ausgangszustand" bold="true" />
+            <info label="A: Das Fenster ist noch zu. Lass den mini 5 Minuten im Raum liegen (nicht in der Hand)." visibility="show_a" />
+            <info label="B: Lege den mini in das Glas, schraube es dicht zu und lass es 5 Minuten bei Zimmertemperatur stehen. Prüfe, ob weiter Werte ankommen." visibility="show_b" />
+            <button visibility="vorhersage" label="Ausgangszustand festhalten">
+                <input type="buffer">T_now</input>
+                <output>T_1</output>
+                <input type="buffer">H_now</input>
+                <output>H_1</output>
+                <input type="buffer">AH_now</input>
+                <output>AH_1</output>
+                <input type="buffer">CO2_now</input>
+                <output>C_1</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Schritt 3 – Verändern" bold="true" />
+            <info label="A: Öffne das Fenster 5 Minuten weit (Stoßlüften), schließe es und warte etwa 10 Minuten, bis die Temperatur wieder ungefähr den Ausgangswert erreicht." visibility="show_a" />
+            <info label="B: Stelle das Glas in kaltes Wasser oder auf die kalte Fensterbank und warte etwa 10 Minuten. Das Glas bleibt dabei zu!" visibility="show_b" />
+            <button visibility="vorhersage" label="Endzustand festhalten">
+                <input type="buffer">T_now</input>
+                <output>T_2</output>
+                <input type="buffer">H_now</input>
+                <output>H_2</output>
+                <input type="buffer">AH_now</input>
+                <output>AH_2</output>
+                <input type="buffer">CO2_now</input>
+                <output>C_2</output>
+                <input type="buffer">t_now</input>
+                <output>t_mark</output>
+            </button>
+            <value visibility="vorhersage" label="Änderung der relativen Feuchte" precision="1" unit="%">
+                <input>dH</input>
+            </value>
+            <value visibility="vorhersage" label="Änderung der absoluten Feuchte" precision="2" unit="g/m³">
+                <input>dAH</input>
+            </value>
+            <value label="Änderung CO₂" precision="0" unit="ppm" visibility="show_a">
+                <input>dCO2</input>
+            </value>
+            <separator visibility="vorhersage" height="2" />
+            <info visibility="vorhersage" label="Vergleiche die relative und die absolute Luftfeuchtigkeit: Hat sich die Wassermenge in der Luft so geändert wie die Prozentzahl? Weiter zum Reiter „3 Nachtest“." />
+        </view>
+
+        <view label="3 Nachtest">
+            <info label="Feuchte Luft beim Lüften – Nachtest" bold="true" size="1.2" />
+            <info label="Beantworte die Fragen jetzt noch einmal, nachdem du gemessen hast." />
+            <separator height="2" />
+            <info label="1. Draußen sind es 2 °C und es nieselt. Du lüftest 5 Minuten lang weit und heizt danach wieder auf die alte Temperatur. Die relative Luftfeuchtigkeit im Zimmer ist dann …" bold="true" />
+            <dropdown default="0">
+                <output>post_lueften</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">höher als vorher</map>
+                <map value="2">niedriger als vorher</map>
+                <map value="3">gleich wie vorher</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_lueften_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="2. Ein fest verschlossenes Glas mit Luft wird abgekühlt. Die relative Luftfeuchtigkeit im Glas …" bold="true" />
+            <dropdown default="0">
+                <output>post_glas</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">steigt</map>
+                <map value="2">sinkt</map>
+                <map value="3">bleibt gleich, weil kein Wasser dazukommt</map>
+            </dropdown>
+            <info label="Wie sicher bist du dir?" size="0.85" />
+            <dropdown default="0">
+                <output>post_glas_sicher</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">geraten</map>
+                <map value="2">eher unsicher</map>
+                <map value="3">eher sicher</map>
+                <map value="4">sehr sicher</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="3. Kalte Luft enthält mehr Wasser als warme Luft." bold="true" />
+            <info label="1 = stimme nicht zu   …   5 = stimme zu" size="0.85" />
+            <slider minValue="1" maxValue="5" stepSize="1" default="3" precision="0" showValue="false">
+                <output>post_kalt</output>
+            </slider>
+            <value label="Deine Antwort" precision="2" visibility="post_kalt">
+                <input>post_kalt</input>
+                <map min="0.5" max="1.5">stimme nicht zu</map>
+                <map min="1.5" max="2.5">stimme eher nicht zu</map>
+                <map min="2.5" max="3.5">teils / teils</map>
+                <map min="3.5" max="4.5">stimme eher zu</map>
+                <map min="4.5" max="5.5">stimme zu</map>
+            </value>
+            <separator height="2" />
+            <info label="4. Im Winter beschlägt die Innenseite einer kalten Fensterscheibe. Warum?" bold="true" />
+            <dropdown default="0">
+                <output>post_scheibe</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">Feuchtigkeit dringt von draußen durch das Glas.</map>
+                <map value="2">Die Zimmerluft kühlt an der Scheibe ab und kann dort weniger Wasserdampf halten.</map>
+                <map value="3">Kalte Luft enthält mehr Wasser.</map>
+            </dropdown>
+            <separator height="2" />
+            <info label="5. Was gibt die relative Luftfeuchtigkeit an?" bold="true" />
+            <dropdown default="0">
+                <output>post_erklaerung</output>
+                <map value="0">– bitte auswählen –</map>
+                <map value="1">wie viele Gramm Wasser in einem Kubikmeter Luft sind</map>
+                <map value="2">wie viel Prozent der bei dieser Temperatur höchstens möglichen Wasserdampfmenge in der Luft sind</map>
+                <map value="3">wie nass sich die Luft anfühlt</map>
+            </dropdown>
+            <separator height="2" />
+            <value label="Noch nicht beantwortet" precision="0" unit="Auswahlfelder" visibility="post_offen" color="orange">
+                <input>post_offen</input>
+            </value>
+            <button label="Nachtest absenden" dynamicLabel="rx_post_stored">
+                <map min="0.5">Nachtest übertragen ✓ – erneut senden</map>
+                <trigger>posttest</trigger>
+            </button>
+            <value label="Übertragene Antworten" precision="0" visibility="rx_post_total">
+                <input>rx_post_stored</input>
+            </value>
+            <value label="Rückmeldungen insgesamt" precision="0" visibility="rx_post_total">
+                <input>rx_post_total</input>
+            </value>
+        </view>
+    </views>
+
+    <export>
+        <set name="Messung HDC">
+            <data name="Zeit (s)">t</data>
+            <data name="Temperatur (°C)">temp</data>
+            <data name="Relative Feuchte (%)">hum</data>
+            <data name="Absolute Feuchte (g/m³)">ah</data>
+        </set>
+        <set name="Messung CO2">
+            <data name="Zeit (s)">tc</data>
+            <data name="CO2 (ppm)">co2</data>
+        </set>
+        <set name="Marker">
+            <data name="rel. Feuchte Anfang (%)">H_1</data>
+            <data name="rel. Feuchte Ende (%)">H_2</data>
+            <data name="abs. Feuchte Anfang (g/m³)">AH_1</data>
+            <data name="abs. Feuchte Ende (g/m³)">AH_2</data>
+            <data name="CO2 Anfang (ppm)">C_1</data>
+            <data name="CO2 Ende (ppm)">C_2</data>
+        </set>
+        <set name="Ergebnisse">
+            <data name="Variante (1 = Lüften, 2 = Glas)">variante</data>
+            <data name="Änderung rel. Feuchte (%)">dH</data>
+            <data name="Änderung abs. Feuchte (g/m³)">dAH</data>
+            <data name="Änderung CO2 (ppm)">dCO2</data>
+            <data name="T Anfang (°C)">T_1</data>
+            <data name="T Ende (°C)">T_2</data>
+        </set>
+        <set name="Antworten">
+            <data name="pre_lueften">pre_lueften</data>
+            <data name="pre_lueften_sicher">pre_lueften_sicher</data>
+            <data name="pre_glas">pre_glas</data>
+            <data name="pre_glas_sicher">pre_glas_sicher</data>
+            <data name="pre_kalt">pre_kalt</data>
+            <data name="vorhersage">vorhersage</data>
+            <data name="post_lueften">post_lueften</data>
+            <data name="post_lueften_sicher">post_lueften_sicher</data>
+            <data name="post_glas">post_glas</data>
+            <data name="post_glas_sicher">post_glas_sicher</data>
+            <data name="post_kalt">post_kalt</data>
+            <data name="post_scheibe">post_scheibe</data>
+            <data name="post_erklaerung">post_erklaerung</data>
+        </set>
+    </export>
+
+    <network>
+        <connection id="pretest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=lueften" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_pre</send>
+            <send id="pre_lueften" type="buffer" keep="true">pre_lueften</send>
+            <send id="pre_lueften_sicher" type="buffer" keep="true">pre_lueften_sicher</send>
+            <send id="pre_glas" type="buffer" keep="true">pre_glas</send>
+            <send id="pre_glas_sicher" type="buffer" keep="true">pre_glas_sicher</send>
+            <send id="pre_kalt" type="buffer" keep="true">pre_kalt</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_pre_stored</receive>
+            <receive id="total" append="false">rx_pre_total</receive>
+        </connection>
+        <connection id="posttest" privacy="https://didaktik.physik.rwth-aachen.de/phyphox/api/privacy.php#umfrage" address="https://didaktik.physik.rwth-aachen.de/phyphox/api/survey_ingest.php?survey=lueften" autoConnect="true" service="http/post" conversion="json">
+            <send id="phase" type="buffer" keep="true">phase_post</send>
+            <send id="vorhersage" type="buffer" keep="true">vorhersage</send>
+            <send id="variante" type="buffer" keep="true">variante</send>
+            <send id="dH" type="buffer" keep="true">dH</send>
+            <send id="dAH" type="buffer" keep="true">dAH</send>
+            <send id="dCO2" type="buffer" keep="true">dCO2</send>
+            <send id="T_1" type="buffer" keep="true">T_1</send>
+            <send id="T_2" type="buffer" keep="true">T_2</send>
+            <send id="post_lueften" type="buffer" keep="true">post_lueften</send>
+            <send id="post_lueften_sicher" type="buffer" keep="true">post_lueften_sicher</send>
+            <send id="post_glas" type="buffer" keep="true">post_glas</send>
+            <send id="post_glas_sicher" type="buffer" keep="true">post_glas_sicher</send>
+            <send id="post_kalt" type="buffer" keep="true">post_kalt</send>
+            <send id="post_scheibe" type="buffer" keep="true">post_scheibe</send>
+            <send id="post_erklaerung" type="buffer" keep="true">post_erklaerung</send>
+            <send id="client" type="meta">uniqueID</send>
+            <send id="time" type="time" />
+            <receive id="stored" append="false">rx_post_stored</receive>
+            <receive id="total" append="false">rx_post_total</receive>
+        </connection>
+    </network>
+</phyphox>
